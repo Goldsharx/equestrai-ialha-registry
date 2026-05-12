@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_app/register")({
   component: RegisterWizardPage,
 });
 
+export { RegisterWizardPage };
+
 type RegistrationType = "purebred_ialha" | "purebred_foreign" | "half_bred";
 
 type WizardData = {
