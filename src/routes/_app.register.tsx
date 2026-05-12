@@ -894,12 +894,14 @@ function StepPhotosMarkings({
   userId,
   ensureRegistration,
   registrationId,
+  onMarkingsChange,
 }: {
   data: WizardData;
   update: (p: Partial<WizardData>) => void;
   userId: string | undefined;
   ensureRegistration: () => Promise<string | null>;
   registrationId: string | null;
+  onMarkingsChange: (blob: Blob | null) => void;
 }) {
   const [photos, setPhotos] = useState<PhotoRow[]>([]);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -1012,10 +1014,7 @@ function StepPhotosMarkings({
             <>
               <MarkingsCanvas
                 initialUrl={photos.find((p) => p.photo_type === "markings")?.url}
-                onSave={async (blob) => {
-                  const file = new File([blob], "markings.png", { type: "image/png" });
-                  await handleUpload("markings", file);
-                }}
+                onChange={onMarkingsChange}
               />
               <Textarea
                 placeholder="Or describe markings (e.g., star on forehead, white left hind sock)…"
