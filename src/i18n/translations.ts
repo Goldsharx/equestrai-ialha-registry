@@ -87,6 +87,8 @@ export const translations = {
     "err.invalidEmail": "Please enter a valid email address",
     "err.passwordTooShort": "Password must be at least 8 characters",
     "err.tryAgain": "Something went wrong. Please try again.",
+    requiredField: "This field is required",
+    invalidEmail: "Please enter a valid email address",
 
     // Statuses (registrations)
     "status.draft": "Draft",
@@ -263,6 +265,8 @@ export const translations = {
     "err.invalidEmail": "Ingresa un correo electrónico válido",
     "err.passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
     "err.tryAgain": "Algo salió mal. Inténtalo de nuevo.",
+    requiredField: "Este campo es obligatorio",
+    invalidEmail: "Ingresa un correo electrónico válido",
 
     // Statuses
     "status.draft": "Borrador",
