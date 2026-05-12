@@ -118,48 +118,57 @@ const COLORS = ["Bay", "Black", "Gray", "Chestnut", "Palomino", "Buckskin", "Dun
 
 function RegisterWizardPage() {
   const user = useUser();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<WizardData>(EMPTY);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const update = (patch: Partial<WizardData>) => setData((d) => ({ ...d, ...patch }));
 
-  const persist = async (next: WizardData) => {
-    if (!user?.id) return;
+  const buildPayload = (next: WizardData) => ({
+    applicant_id: user!.id,
+    status: "draft" as const,
+    type: next.type,
+    horse_name: next.name_choice_1 || null,
+    name_choice_1: next.name_choice_1 || null,
+    name_choice_2: next.name_choice_2 || null,
+    name_choice_3: next.name_choice_3 || null,
+    birth_date: next.birth_date ? format(next.birth_date, "yyyy-MM-dd") : null,
+    sex: next.sex || null,
+    color: next.color || null,
+    birth_country: next.birth_country || null,
+    microchip_number: next.microchip_number || null,
+    dna_case_number: next.dna_case_number || null,
+    sire_id: next.sire_id,
+    sire_name: next.sire_name || null,
+    dam_id: next.dam_id,
+    dam_name: next.dam_name || null,
+    foreign_registry_name: next.foreign_registry_name || null,
+    foreign_registration_number: next.foreign_registration_number || null,
+    breeder_name: next.breeder_name || null,
+    breeder_contact: next.breeder_contact || null,
+    stallion_owner_name: next.stallion_owner_name || null,
+    stallion_owner_contact: next.stallion_owner_contact || null,
+    markings_description: next.no_markings ? "NONE" : (next.markings_description || null),
+    no_markings: next.no_markings,
+    add_ons: next.add_ons,
+    terms_accepted: next.terms_accepted,
+  });
+
+  const persist = async (next: WizardData): Promise<string | null> => {
+    if (!user?.id) return null;
     setSaving(true);
     try {
-      const payload = {
-        applicant_id: user.id,
-        status: "draft" as const,
-        type: next.type,
-        horse_name: next.name_choice_1 || null,
-        name_choice_1: next.name_choice_1 || null,
-        name_choice_2: next.name_choice_2 || null,
-        name_choice_3: next.name_choice_3 || null,
-        birth_date: next.birth_date ? format(next.birth_date, "yyyy-MM-dd") : null,
-        sex: next.sex || null,
-        color: next.color || null,
-        birth_country: next.birth_country || null,
-        microchip_number: next.microchip_number || null,
-        dna_case_number: next.dna_case_number || null,
-        sire_id: next.sire_id,
-        sire_name: next.sire_name || null,
-        dam_id: next.dam_id,
-        dam_name: next.dam_name || null,
-        foreign_registry_name: next.foreign_registry_name || null,
-        foreign_registration_number: next.foreign_registration_number || null,
-        breeder_name: next.breeder_name || null,
-        breeder_contact: next.breeder_contact || null,
-        stallion_owner_name: next.stallion_owner_name || null,
-        stallion_owner_contact: next.stallion_owner_contact || null,
-      };
+      const payload = buildPayload(next);
       if (registrationId) {
         const { error } = await supabase
           .from("registrations")
           .update(payload)
           .eq("id", registrationId);
         if (error) throw error;
+        return registrationId;
       } else {
         const { data: row, error } = await supabase
           .from("registrations")
@@ -168,10 +177,12 @@ function RegisterWizardPage() {
           .single();
         if (error) throw error;
         setRegistrationId(row.id);
+        return row.id;
       }
     } catch (err) {
       console.error(err);
       toast.error("Couldn't save draft");
+      return null;
     } finally {
       setSaving(false);
     }
@@ -183,6 +194,22 @@ function RegisterWizardPage() {
   };
 
   const goBack = () => setStep((s) => Math.max(1, s - 1));
+
+  const handleSaveDraft = async () => {
+    const id = await persist(data);
+    if (id) toast.success("Draft saved");
+  };
+
+  const handleSubmitAndPay = async () => {
+    if (!data.terms_accepted) {
+      toast.error("Please accept the terms to continue");
+      return;
+    }
+    setSubmitting(true);
+    const id = await persist(data);
+    setSubmitting(false);
+    if (id) navigate({ to: "/register/$registrationId/pay", params: { registrationId: id } });
+  };
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -206,12 +233,25 @@ function RegisterWizardPage() {
 
       {step === 3 && <StepParentage data={data} update={update} userId={user?.id} />}
 
-      {step >= 4 && (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            Step {step}: {STEPS[step - 1].label} — coming next.
-          </CardContent>
-        </Card>
+      {step === 4 && (
+        <StepPhotosMarkings
+          data={data}
+          update={update}
+          userId={user?.id}
+          ensureRegistration={() => persist(data)}
+          registrationId={registrationId}
+        />
+      )}
+
+      {step === 5 && (
+        <StepReview
+          data={data}
+          onSaveDraft={handleSaveDraft}
+          onSubmit={handleSubmitAndPay}
+          saving={saving}
+          submitting={submitting}
+          update={update}
+        />
       )}
 
       <div className="flex items-center justify-between">
