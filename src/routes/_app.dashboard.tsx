@@ -35,14 +35,27 @@ type RegistrationStatus =
   | "approved"
   | "rejected";
 
-const statusStyles: Record<RegistrationStatus, { label: string; className: string }> = {
-  draft: { label: "Draft", className: "bg-muted text-muted-foreground border-border" },
-  pending_signatures: { label: "Pending Signatures", className: "bg-yellow-100 text-yellow-900 border-yellow-300" },
-  pending_payment: { label: "Pending Payment", className: "bg-orange-100 text-orange-900 border-orange-300" },
-  submitted: { label: "Submitted", className: "bg-blue-100 text-blue-900 border-blue-300" },
-  in_review: { label: "In Review", className: "bg-purple-100 text-purple-900 border-purple-300" },
-  approved: { label: "Approved", className: "bg-green-100 text-green-900 border-green-300" },
-  rejected: { label: "Rejected", className: "bg-destructive/10 text-destructive border-destructive/30" },
+type StatusKey =
+  | "draft"
+  | "pending_signatures"
+  | "pending_payment"
+  | "submitted"
+  | "in_review"
+  | "approved"
+  | "rejected"
+  | "needs_info"
+  | "pending_board";
+
+const statusClasses: Record<StatusKey, string> = {
+  draft: "bg-muted text-muted-foreground border-border",
+  pending_signatures: "bg-yellow-100 text-yellow-900 border-yellow-300",
+  pending_payment: "bg-orange-100 text-orange-900 border-orange-300",
+  submitted: "bg-blue-100 text-blue-900 border-blue-300",
+  in_review: "bg-purple-100 text-purple-900 border-purple-300",
+  approved: "bg-green-100 text-green-900 border-green-300",
+  rejected: "bg-destructive/10 text-destructive border-destructive/30",
+  needs_info: "bg-amber-100 text-amber-900 border-amber-300",
+  pending_board: "bg-indigo-100 text-indigo-900 border-indigo-300",
 };
 
 function DashboardPage() {
