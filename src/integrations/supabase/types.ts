@@ -280,6 +280,7 @@ export type Database = {
           membership_type: string | null
           phone: string | null
           preferred_language: string
+          role: string | null
           state: string | null
           updated_at: string
           user_id: string
@@ -299,6 +300,7 @@ export type Database = {
           membership_type?: string | null
           phone?: string | null
           preferred_language?: string
+          role?: string | null
           state?: string | null
           updated_at?: string
           user_id: string
@@ -318,6 +320,7 @@ export type Database = {
           membership_type?: string | null
           phone?: string | null
           preferred_language?: string
+          role?: string | null
           state?: string | null
           updated_at?: string
           user_id?: string
