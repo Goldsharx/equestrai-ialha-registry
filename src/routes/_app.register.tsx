@@ -125,6 +125,7 @@ function RegisterWizardPage() {
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [markingsBlob, setMarkingsBlob] = useState<Blob | null>(null);
 
   const update = (patch: Partial<WizardData>) => setData((d) => ({ ...d, ...patch }));
 
@@ -158,18 +159,45 @@ function RegisterWizardPage() {
     terms_accepted: next.terms_accepted,
   });
 
-  const persist = async (next: WizardData): Promise<string | null> => {
+  const uploadMarkingsCanvas = async (regId: string, blob: Blob) => {
+    if (!user?.id) throw new Error("You must be logged in to save markings");
+    console.log("[markings-canvas] uploading drawing", { registration_id: regId });
+    const path = `${user.id}/registration-${regId}/markings-${Date.now()}.png`;
+    const { error: upErr } = await supabase.storage
+      .from("photos")
+      .upload(path, blob, { contentType: "image/png", upsert: true });
+    if (upErr) throw upErr;
+
+    const { data: pub } = supabase.storage.from("photos").getPublicUrl(path);
+    const { error: deleteErr } = await supabase
+      .from("horse_photos")
+      .delete()
+      .eq("registration_id", regId)
+      .eq("photo_type", "markings");
+    if (deleteErr) throw deleteErr;
+
+    const { error: insErr } = await supabase.from("horse_photos").insert({
+      registration_id: regId,
+      url: pub.publicUrl,
+      photo_type: "markings",
+    });
+    if (insErr) throw insErr;
+    setMarkingsBlob(null);
+    console.log("[markings-canvas] drawing saved", { registration_id: regId });
+  };
+
+  const persist = async (next: WizardData, options: { saveMarkings?: boolean } = {}): Promise<string | null> => {
     if (!user?.id) return null;
     setSaving(true);
     try {
       const payload = buildPayload(next);
+      let savedId = registrationId;
       if (registrationId) {
         const { error } = await supabase
           .from("registrations")
           .update(payload)
           .eq("id", registrationId);
         if (error) throw error;
-        return registrationId;
       } else {
         const { data: row, error } = await supabase
           .from("registrations")
@@ -177,9 +205,13 @@ function RegisterWizardPage() {
           .select("id")
           .single();
         if (error) throw error;
+        savedId = row.id;
         setRegistrationId(row.id);
-        return row.id;
       }
+      if (savedId && options.saveMarkings && markingsBlob && !next.no_markings) {
+        await uploadMarkingsCanvas(savedId, markingsBlob);
+      }
+      return savedId;
     } catch (err) {
       console.error(err);
       toast.error("Couldn't save draft");
@@ -190,14 +222,15 @@ function RegisterWizardPage() {
   };
 
   const goNext = async () => {
-    await persist(data);
+    const id = await persist(data, { saveMarkings: step === 4 });
+    if (step === 4 && !id) return;
     setStep((s) => Math.min(STEPS.length, s + 1));
   };
 
   const goBack = () => setStep((s) => Math.max(1, s - 1));
 
   const handleSaveDraft = async () => {
-    const id = await persist(data);
+    const id = await persist(data, { saveMarkings: true });
     if (id) {
       toast.success("Draft saved");
       navigate({ to: "/dashboard" });
@@ -212,7 +245,7 @@ function RegisterWizardPage() {
     setSubmitting(true);
     try {
       console.log("[submit-and-pay] saving draft…");
-      const id = await persist(data);
+      const id = await persist(data, { saveMarkings: true });
       if (!id) throw new Error("Failed to save registration draft");
       console.log("[submit-and-pay] draft saved", id);
 
