@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      fee_schedule: {
+        Row: {
+          active: boolean
+          amount: number
+          code: string
+          created_at: string
+          currency: string
+          description: string
+          id: string
+        }
+        Insert: {
+          active?: boolean
+          amount: number
+          code: string
+          created_at?: string
+          currency?: string
+          description: string
+          id?: string
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          id?: string
+        }
+        Relationships: []
+      }
       foreign_documents: {
         Row: {
           created_at: string
@@ -53,22 +83,28 @@ export type Database = {
         Row: {
           caption: string | null
           created_at: string
-          horse_id: string
+          horse_id: string | null
           id: string
+          photo_type: string | null
+          registration_id: string | null
           url: string
         }
         Insert: {
           caption?: string | null
           created_at?: string
-          horse_id: string
+          horse_id?: string | null
           id?: string
+          photo_type?: string | null
+          registration_id?: string | null
           url: string
         }
         Update: {
           caption?: string | null
           created_at?: string
-          horse_id?: string
+          horse_id?: string | null
           id?: string
+          photo_type?: string | null
+          registration_id?: string | null
           url?: string
         }
         Relationships: [
@@ -77,6 +113,13 @@ export type Database = {
             columns: ["horse_id"]
             isOneToOne: false
             referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "horse_photos_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
             referencedColumns: ["id"]
           },
         ]
@@ -236,6 +279,7 @@ export type Database = {
       }
       registrations: {
         Row: {
+          add_ons: Json
           applicant_id: string
           birth_country: string | null
           birth_date: string | null
@@ -251,10 +295,12 @@ export type Database = {
           horse_id: string | null
           horse_name: string | null
           id: string
+          markings_description: string | null
           microchip_number: string | null
           name_choice_1: string | null
           name_choice_2: string | null
           name_choice_3: string | null
+          no_markings: boolean
           sex: string | null
           sire_id: string | null
           sire_name: string | null
@@ -262,10 +308,12 @@ export type Database = {
           stallion_owner_name: string | null
           status: Database["public"]["Enums"]["registration_status"]
           submitted_at: string | null
+          terms_accepted: boolean
           type: string | null
           updated_at: string
         }
         Insert: {
+          add_ons?: Json
           applicant_id: string
           birth_country?: string | null
           birth_date?: string | null
@@ -281,10 +329,12 @@ export type Database = {
           horse_id?: string | null
           horse_name?: string | null
           id?: string
+          markings_description?: string | null
           microchip_number?: string | null
           name_choice_1?: string | null
           name_choice_2?: string | null
           name_choice_3?: string | null
+          no_markings?: boolean
           sex?: string | null
           sire_id?: string | null
           sire_name?: string | null
@@ -292,10 +342,12 @@ export type Database = {
           stallion_owner_name?: string | null
           status?: Database["public"]["Enums"]["registration_status"]
           submitted_at?: string | null
+          terms_accepted?: boolean
           type?: string | null
           updated_at?: string
         }
         Update: {
+          add_ons?: Json
           applicant_id?: string
           birth_country?: string | null
           birth_date?: string | null
@@ -311,10 +363,12 @@ export type Database = {
           horse_id?: string | null
           horse_name?: string | null
           id?: string
+          markings_description?: string | null
           microchip_number?: string | null
           name_choice_1?: string | null
           name_choice_2?: string | null
           name_choice_3?: string | null
+          no_markings?: boolean
           sex?: string | null
           sire_id?: string | null
           sire_name?: string | null
@@ -322,6 +376,7 @@ export type Database = {
           stallion_owner_name?: string | null
           status?: Database["public"]["Enums"]["registration_status"]
           submitted_at?: string | null
+          terms_accepted?: boolean
           type?: string | null
           updated_at?: string
         }
