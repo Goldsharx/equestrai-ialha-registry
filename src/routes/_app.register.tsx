@@ -351,7 +351,7 @@ function StepType({
             type="button"
             onClick={() => onSelect(o.id)}
             className={cn(
-              "rounded-lg border-2 bg-card p-6 text-left transition-all hover:border-secondary hover:shadow-md",
+              "cursor-pointer rounded-lg border-2 bg-card p-6 text-left transition-all hover:border-secondary hover:shadow-md",
               active ? "border-secondary shadow-md" : "border-muted-foreground/20",
             )}
           >
