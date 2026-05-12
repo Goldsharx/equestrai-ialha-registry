@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      horses: {
+        Row: {
+          breed: string | null
+          created_at: string
+          current_owner_id: string
+          date_of_birth: string | null
+          id: string
+          name: string
+          registration_number: string | null
+          sex: string | null
+          updated_at: string
+        }
+        Insert: {
+          breed?: string | null
+          created_at?: string
+          current_owner_id: string
+          date_of_birth?: string | null
+          id?: string
+          name: string
+          registration_number?: string | null
+          sex?: string | null
+          updated_at?: string
+        }
+        Update: {
+          breed?: string | null
+          created_at?: string
+          current_owner_id?: string
+          date_of_birth?: string | null
+          id?: string
+          name?: string
+          registration_number?: string | null
+          sex?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address_line1: string | null
@@ -62,6 +128,47 @@ export type Database = {
         }
         Relationships: []
       }
+      registrations: {
+        Row: {
+          applicant_id: string
+          created_at: string
+          horse_id: string | null
+          horse_name: string | null
+          id: string
+          status: Database["public"]["Enums"]["registration_status"]
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          created_at?: string
+          horse_id?: string | null
+          horse_name?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["registration_status"]
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          created_at?: string
+          horse_id?: string | null
+          horse_name?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["registration_status"]
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrations_horse_id_fkey"
+            columns: ["horse_id"]
+            isOneToOne: false
+            referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -70,7 +177,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      registration_status:
+        | "draft"
+        | "pending_signatures"
+        | "pending_payment"
+        | "submitted"
+        | "in_review"
+        | "approved"
+        | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -197,6 +311,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      registration_status: [
+        "draft",
+        "pending_signatures",
+        "pending_payment",
+        "submitted",
+        "in_review",
+        "approved",
+        "rejected",
+      ],
+    },
   },
 } as const
