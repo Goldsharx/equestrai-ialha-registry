@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json
+        }
+        Relationships: []
+      }
       fee_schedule: {
         Row: {
           active: boolean
@@ -284,6 +317,7 @@ export type Database = {
         Row: {
           add_ons: Json
           ai_screening_notes: string | null
+          ai_screening_result: Json | null
           ai_screening_score: number | null
           applicant_id: string
           birth_country: string | null
@@ -324,6 +358,7 @@ export type Database = {
         Insert: {
           add_ons?: Json
           ai_screening_notes?: string | null
+          ai_screening_result?: Json | null
           ai_screening_score?: number | null
           applicant_id: string
           birth_country?: string | null
@@ -364,6 +399,7 @@ export type Database = {
         Update: {
           add_ons?: Json
           ai_screening_notes?: string | null
+          ai_screening_result?: Json | null
           ai_screening_score?: number | null
           applicant_id?: string
           birth_country?: string | null
@@ -526,14 +562,43 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      app_role: "member" | "staff" | "registrar" | "admin" | "board"
       registration_status:
         | "draft"
         | "pending_signatures"
@@ -542,6 +607,8 @@ export type Database = {
         | "in_review"
         | "approved"
         | "rejected"
+        | "needs_info"
+        | "pending_board"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -669,6 +736,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["member", "staff", "registrar", "admin", "board"],
       registration_status: [
         "draft",
         "pending_signatures",
@@ -677,6 +745,8 @@ export const Constants = {
         "in_review",
         "approved",
         "rejected",
+        "needs_info",
+        "pending_board",
       ],
     },
   },
