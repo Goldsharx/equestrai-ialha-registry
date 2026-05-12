@@ -27,6 +27,7 @@ import { Route as PublicStudbookHorseIdRouteImport } from './routes/_public.stud
 import { Route as AppHorsesHorseIdRouteImport } from './routes/_app.horses.$horseId'
 import { Route as AppAdminTransfersRouteImport } from './routes/_app.admin.transfers'
 import { Route as AppAdminRegistrationsRouteImport } from './routes/_app.admin.registrations'
+import { Route as AppAdminHorsesRouteImport } from './routes/_app.admin.horses'
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
 import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
 import { Route as AppRegisterRegistrationIdPayRouteImport } from './routes/_app.register.$registrationId.pay'
@@ -121,6 +122,11 @@ const AppAdminRegistrationsRoute = AppAdminRegistrationsRouteImport.update({
   path: '/registrations',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppAdminHorsesRoute = AppAdminHorsesRouteImport.update({
+  id: '/horses',
+  path: '/horses',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppTransferTransferIdPayRoute =
   AppTransferTransferIdPayRouteImport.update({
     id: '/$transferId/pay',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
+  '/admin/horses': typeof AppAdminHorsesRoute
   '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
   '/admin/transfers': typeof AppAdminTransfersRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
+  '/admin/horses': typeof AppAdminHorsesRoute
   '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
   '/admin/transfers': typeof AppAdminTransfersRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/_app/transfer': typeof AppTransferRouteWithChildren
   '/_public/studbook': typeof PublicStudbookRouteWithChildren
   '/_public/': typeof PublicIndexRoute
+  '/_app/admin/horses': typeof AppAdminHorsesRoute
   '/_app/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
   '/_app/admin/transfers': typeof AppAdminTransfersRouteWithChildren
   '/_app/horses/$horseId': typeof AppHorsesHorseIdRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/transfer'
     | '/studbook'
+    | '/admin/horses'
     | '/admin/registrations'
     | '/admin/transfers'
     | '/horses/$horseId'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/transfer'
     | '/studbook'
+    | '/admin/horses'
     | '/admin/registrations'
     | '/admin/transfers'
     | '/horses/$horseId'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/_app/transfer'
     | '/_public/studbook'
     | '/_public/'
+    | '/_app/admin/horses'
     | '/_app/admin/registrations'
     | '/_app/admin/transfers'
     | '/_app/horses/$horseId'
@@ -433,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRegistrationsRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/horses': {
+      id: '/_app/admin/horses'
+      path: '/horses'
+      fullPath: '/admin/horses'
+      preLoaderRoute: typeof AppAdminHorsesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/transfer/$transferId/pay': {
       id: '/_app/transfer/$transferId/pay'
       path: '/$transferId/pay'
@@ -497,11 +516,13 @@ const AppAdminTransfersRouteWithChildren =
   AppAdminTransfersRoute._addFileChildren(AppAdminTransfersRouteChildren)
 
 interface AppAdminRouteChildren {
+  AppAdminHorsesRoute: typeof AppAdminHorsesRoute
   AppAdminRegistrationsRoute: typeof AppAdminRegistrationsRouteWithChildren
   AppAdminTransfersRoute: typeof AppAdminTransfersRouteWithChildren
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminHorsesRoute: AppAdminHorsesRoute,
   AppAdminRegistrationsRoute: AppAdminRegistrationsRouteWithChildren,
   AppAdminTransfersRoute: AppAdminTransfersRouteWithChildren,
 }
