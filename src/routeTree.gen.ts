@@ -23,6 +23,7 @@ import { Route as AppHorsesRouteImport } from './routes/_app.horses'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppChatRouteImport } from './routes/_app.chat'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as PublicStudbookHorseIdRouteImport } from './routes/_public.studbook.$horseId'
 import { Route as AppHorsesHorseIdRouteImport } from './routes/_app.horses.$horseId'
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
 import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
@@ -96,6 +97,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const PublicStudbookHorseIdRoute = PublicStudbookHorseIdRouteImport.update({
+  id: '/$horseId',
+  path: '/$horseId',
+  getParentRoute: () => PublicStudbookRoute,
+} as any)
 const AppHorsesHorseIdRoute = AppHorsesHorseIdRouteImport.update({
   id: '/$horseId',
   path: '/$horseId',
@@ -132,8 +138,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
-  '/studbook': typeof PublicStudbookRoute
+  '/studbook': typeof PublicStudbookRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
+  '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -150,8 +157,9 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
-  '/studbook': typeof PublicStudbookRoute
+  '/studbook': typeof PublicStudbookRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
+  '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -170,9 +178,10 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/register': typeof AppRegisterRouteWithChildren
   '/_app/transfer': typeof AppTransferRouteWithChildren
-  '/_public/studbook': typeof PublicStudbookRoute
+  '/_public/studbook': typeof PublicStudbookRouteWithChildren
   '/_public/': typeof PublicIndexRoute
   '/_app/horses/$horseId': typeof AppHorsesHorseIdRoute
+  '/_public/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/_app/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/_app/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/_app/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/transfer'
     | '/studbook'
     | '/horses/$horseId'
+    | '/studbook/$horseId'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/transfer'
     | '/studbook'
     | '/horses/$horseId'
+    | '/studbook/$horseId'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/_public/studbook'
     | '/_public/'
     | '/_app/horses/$horseId'
+    | '/_public/studbook/$horseId'
     | '/_app/register/$registrationId/pay'
     | '/_app/register/$registrationId/status'
     | '/_app/transfer/$transferId/pay'
@@ -343,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_public/studbook/$horseId': {
+      id: '/_public/studbook/$horseId'
+      path: '/$horseId'
+      fullPath: '/studbook/$horseId'
+      preLoaderRoute: typeof PublicStudbookHorseIdRouteImport
+      parentRoute: typeof PublicStudbookRoute
+    }
     '/_app/horses/$horseId': {
       id: '/_app/horses/$horseId'
       path: '/$horseId'
@@ -436,13 +455,25 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface PublicStudbookRouteChildren {
+  PublicStudbookHorseIdRoute: typeof PublicStudbookHorseIdRoute
+}
+
+const PublicStudbookRouteChildren: PublicStudbookRouteChildren = {
+  PublicStudbookHorseIdRoute: PublicStudbookHorseIdRoute,
+}
+
+const PublicStudbookRouteWithChildren = PublicStudbookRoute._addFileChildren(
+  PublicStudbookRouteChildren,
+)
+
 interface PublicRouteChildren {
-  PublicStudbookRoute: typeof PublicStudbookRoute
+  PublicStudbookRoute: typeof PublicStudbookRouteWithChildren
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
-  PublicStudbookRoute: PublicStudbookRoute,
+  PublicStudbookRoute: PublicStudbookRouteWithChildren,
   PublicIndexRoute: PublicIndexRoute,
 }
 
