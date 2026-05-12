@@ -629,7 +629,11 @@ function ParentSearch({
     <Field label={label} htmlFor={`p-${label}`}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button id={`p-${label}`} variant="outline" className="justify-start font-normal">
+          <Button
+            id={`p-${label}`}
+            variant="outline"
+            className="h-10 w-full justify-start font-normal"
+          >
             <Search className="mr-2 h-4 w-4" /> {display}
           </Button>
         </PopoverTrigger>
