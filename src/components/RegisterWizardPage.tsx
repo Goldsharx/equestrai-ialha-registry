@@ -734,19 +734,23 @@ function ParentSearch({
     return () => clearTimeout(t);
   }, [query, open, sex]);
 
-  const display = useMemo(() => value.name || `Search ${label.toLowerCase()}…`, [value.name, label]);
+  const display = useMemo(() => value.name || `Search by name…`, [value.name]);
 
   return (
     <Field label={label} htmlFor={`p-${label}`}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
+          <button
             id={`p-${label}`}
-            variant="outline"
-            className="h-9 w-full justify-start px-3 text-left font-normal"
+            type="button"
+            className={cn(
+              "flex h-9 w-full items-center rounded-md border border-input bg-transparent px-3 py-1 text-left text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
+              !value.name && "text-muted-foreground",
+            )}
           >
-            <Search className="mr-2 h-4 w-4" /> <span className="truncate">{display}</span>
-          </Button>
+            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="truncate">{display}</span>
+          </button>
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] min-w-80 p-2" align="start">
           <Input
