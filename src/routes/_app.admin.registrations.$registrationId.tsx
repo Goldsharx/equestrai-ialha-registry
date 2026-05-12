@@ -148,7 +148,7 @@ function AdminRegistrationDetail() {
   const setStatus = async (newStatus: string, note?: string) => {
     if (!reg) return;
     setBusy(true);
-    const update: { status: string; reviewer_notes?: string } = { status: newStatus };
+    const update: { status: import("@/integrations/supabase/types").Database["public"]["Enums"]["registration_status"]; reviewer_notes?: string } = { status: newStatus as "approved" };
     if (note !== undefined) update.reviewer_notes = note;
     if (newStatus === "approved" && reg.horse_id) {
       await supabase.from("horses").update({ status: "approved" }).eq("id", reg.horse_id);
