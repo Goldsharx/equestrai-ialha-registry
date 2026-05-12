@@ -8,6 +8,11 @@ import {
   MessageSquare,
   Shield,
   Bell,
+  ClipboardList,
+  Users,
+  DollarSign,
+  BarChart3,
+  Activity,
 } from "lucide-react";
 import {
   Sidebar,
@@ -33,7 +38,16 @@ const main = [
   { titleKey: "nav.profile", url: "/profile", icon: User },
 ] as const;
 
-const adminItems = [{ titleKey: "nav.admin", url: "/admin", icon: Shield }] as const;
+const adminItems = [
+  { title: "Admin Dashboard", url: "/admin", icon: Shield },
+  { title: "Registrations", url: "/admin/registrations", icon: ClipboardList },
+  { title: "Transfers", url: "/admin/transfers", icon: ArrowLeftRight },
+  { title: "Horses", url: "/admin/horses", icon: Rabbit },
+  { title: "Members", url: "/admin/members", icon: Users },
+  { title: "Fees", url: "/admin/fees", icon: DollarSign },
+  { title: "Reports", url: "/admin/reports", icon: BarChart3 },
+  { title: "Activity Log", url: "/admin/activity", icon: Activity },
+] as const;
 
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
@@ -79,7 +93,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {adminItems.map((item) => {
-                const label = t(item.titleKey);
+                const label = item.title;
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={label}>
