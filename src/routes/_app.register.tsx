@@ -459,11 +459,11 @@ function StepDetails({
                 id="dob"
                 type="button"
                 className={cn(
-                  "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-left text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
                   !data.birth_date && "text-muted-foreground",
                 )}
               >
-                <span>{data.birth_date ? format(data.birth_date, "PPP") : "Select birth date"}</span>
+                <span className="truncate">{data.birth_date ? format(data.birth_date, "PPP") : "Select birth date"}</span>
                 <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
               </button>
             </PopoverTrigger>
@@ -474,8 +474,8 @@ function StepDetails({
                 onSelect={(d) => update({ birth_date: d ?? null })}
                 disabled={(d) => d > new Date() || d < new Date("1990-01-01")}
                 captionLayout="dropdown"
-                fromYear={1990}
-                toYear={new Date().getFullYear()}
+                startMonth={new Date(1990, 0)}
+                endMonth={new Date(new Date().getFullYear(), 11)}
                 defaultMonth={data.birth_date ?? new Date()}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
