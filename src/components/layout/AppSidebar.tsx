@@ -8,6 +8,11 @@ import {
   MessageSquare,
   Shield,
   Bell,
+  ClipboardList,
+  Users,
+  DollarSign,
+  BarChart3,
+  Activity,
 } from "lucide-react";
 import {
   Sidebar,
