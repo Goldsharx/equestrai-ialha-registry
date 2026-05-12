@@ -93,7 +93,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {adminItems.map((item) => {
-                const label = t(item.titleKey);
+                const label = item.title;
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={label}>
