@@ -21,21 +21,24 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+import { useLanguage } from "@/contexts/LanguageContext";
+
 const main = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "My Horses", url: "/horses", icon: Rabbit },
-  { title: "Register", url: "/register", icon: FilePlus },
-  { title: "Transfer", url: "/transfer", icon: ArrowLeftRight },
-  { title: "Notifications", url: "/notifications", icon: Bell },
-  { title: "Chat", url: "/chat", icon: MessageSquare },
-  { title: "Profile", url: "/profile", icon: User },
+  { titleKey: "nav.dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { titleKey: "nav.myHorses", url: "/horses", icon: Rabbit },
+  { titleKey: "nav.register", url: "/register", icon: FilePlus },
+  { titleKey: "nav.transfer", url: "/transfer", icon: ArrowLeftRight },
+  { titleKey: "nav.notifications", url: "/notifications", icon: Bell },
+  { titleKey: "nav.chat", url: "/chat", icon: MessageSquare },
+  { titleKey: "nav.profile", url: "/profile", icon: User },
 ] as const;
 
-const adminItems = [{ title: "Admin", url: "/admin", icon: Shield }] as const;
+const adminItems = [{ titleKey: "nav.admin", url: "/admin", icon: Shield }] as const;
 
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (p: string) => currentPath === p;
+  const { t } = useLanguage();
 
   return (
     <Sidebar collapsible="icon">
