@@ -299,6 +299,7 @@ function RegisterWizardPage() {
           userId={user?.id}
           ensureRegistration={() => persist(data)}
           registrationId={registrationId}
+          onMarkingsChange={setMarkingsBlob}
         />
       )}
 
@@ -311,6 +312,7 @@ function RegisterWizardPage() {
           submitting={submitting}
           update={update}
           registrationId={registrationId}
+          markingsBlob={markingsBlob}
         />
       )}
 
