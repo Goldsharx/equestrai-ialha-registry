@@ -1,89 +1,83 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { translations, type Language, type TKey } from "@/i18n/translations";
 
-export type Language = "en" | "es";
+const STORAGE_KEY = "preferred_language";
 
-const dictionary = {
-  en: {
-    welcomeBack: "Welcome back",
-    loginSubtitle: "Log in to your IALHA registry account.",
-    email: "Email",
-    password: "Password",
-    fullName: "Full name",
-    phone: "Phone",
-    farmName: "Farm name (optional)",
-    addressLine1: "Address line 1",
-    addressLine2: "Address line 2 (optional)",
-    city: "City",
-    state: "State",
-    zip: "ZIP code",
-    preferredLanguage: "Preferred language",
-    english: "English",
-    spanish: "Spanish",
-    login: "Log in",
-    signup: "Sign up",
-    magicLink: "Email me a login link",
-    sendingLink: "Sending link...",
-    linkSent: "Check your email for a login link.",
-    noAccount: "Don't have an account?",
-    haveAccount: "Already a member?",
-    createAccount: "Create your account",
-    signupSubtitle: "Join the IALHA registry community.",
-    creatingAccount: "Creating account...",
-    loggingIn: "Logging in...",
-    requiredField: "This field is required",
-    invalidEmail: "Please enter a valid email address",
-    contactInfo: "Contact information",
-    addressInfo: "Address",
-    accountInfo: "Account",
-  },
-  es: {
-    welcomeBack: "Bienvenido de nuevo",
-    loginSubtitle: "Inicia sesión en tu cuenta del registro IALHA.",
-    email: "Correo electrónico",
-    password: "Contraseña",
-    fullName: "Nombre completo",
-    phone: "Teléfono",
-    farmName: "Nombre del rancho (opcional)",
-    addressLine1: "Dirección línea 1",
-    addressLine2: "Dirección línea 2 (opcional)",
-    city: "Ciudad",
-    state: "Estado",
-    zip: "Código postal",
-    preferredLanguage: "Idioma preferido",
-    english: "Inglés",
-    spanish: "Español",
-    login: "Iniciar sesión",
-    signup: "Registrarse",
-    magicLink: "Enviarme un enlace de acceso",
-    sendingLink: "Enviando enlace...",
-    linkSent: "Revisa tu correo para un enlace de acceso.",
-    noAccount: "¿No tienes una cuenta?",
-    haveAccount: "¿Ya eres miembro?",
-    createAccount: "Crea tu cuenta",
-    signupSubtitle: "Únete a la comunidad del registro IALHA.",
-    creatingAccount: "Creando cuenta...",
-    loggingIn: "Iniciando sesión...",
-    requiredField: "Este campo es obligatorio",
-    invalidEmail: "Ingresa un correo electrónico válido",
-    contactInfo: "Información de contacto",
-    addressInfo: "Dirección",
-    accountInfo: "Cuenta",
-  },
-} as const;
-
-export type TKey = keyof typeof dictionary["en"];
+function readStored(): Language {
+  if (typeof window === "undefined") return "en";
+  const v = window.localStorage.getItem(STORAGE_KEY);
+  return v === "es" ? "es" : "en";
+}
 
 interface LanguageContextValue {
   lang: Language;
   setLang: (l: Language) => void;
-  t: (key: TKey) => string;
+  t: (key: TKey | string, vars?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Language>("en");
-  const t = (key: TKey) => dictionary[lang][key];
+  const { user } = useAuth();
+  const [lang, setLangState] = useState<Language>(() => readStored());
+
+  // Sync from profile after sign-in
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("preferred_language")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!active) return;
+      const pref = data?.preferred_language;
+      if (pref === "en" || pref === "es") {
+        setLangState(pref);
+        window.localStorage.setItem(STORAGE_KEY, pref);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  const setLang = useCallback(
+    (l: Language) => {
+      setLangState(l);
+      if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, l);
+      if (user) {
+        // Fire and forget; don't block UI
+        void supabase.from("profiles").update({ preferred_language: l }).eq("user_id", user.id);
+      }
+    },
+    [user],
+  );
+
+  const t = useCallback(
+    (key: TKey | string, vars?: Record<string, string | number>) => {
+      const dict = translations[lang] as Record<string, string>;
+      let str = dict[key as string] ?? (translations.en as Record<string, string>)[key as string] ?? key;
+      if (vars) {
+        for (const [k, v] of Object.entries(vars)) {
+          str = str.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+        }
+      }
+      return str;
+    },
+    [lang],
+  );
+
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>{children}</LanguageContext.Provider>
   );
@@ -94,3 +88,5 @@ export function useLanguage() {
   if (!ctx) throw new Error("useLanguage must be used inside <LanguageProvider>");
   return ctx;
 }
+
+export type { Language, TKey };
