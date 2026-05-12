@@ -32,7 +32,7 @@ const MEMBERSHIPS = ["", "non_member", "member", "lifetime", "junior"];
 const ROLES: Role[] = ["member", "staff", "registrar", "admin", "board"];
 
 export const Route = createFileRoute("/_app/admin/members")({
-  head: () => ({ meta: [{ title: "Members — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Members — Equestrai" }] }),
   component: AdminMembers,
 });
 

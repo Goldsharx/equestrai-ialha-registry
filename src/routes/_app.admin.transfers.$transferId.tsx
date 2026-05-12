@@ -32,7 +32,7 @@ type Transfer = {
 };
 
 export const Route = createFileRoute("/_app/admin/transfers/$transferId")({
-  head: () => ({ meta: [{ title: "Review Transfer — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Review Transfer — Equestrai" }] }),
   component: AdminTransferDetail,
 });
 

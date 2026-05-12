@@ -18,13 +18,13 @@ import {
 export const Route = createFileRoute("/_public/studbook")({
   head: () => ({
     meta: [
-      { title: "Studbook — EquestRai" },
+      { title: "Studbook — Equestrai" },
       {
         name: "description",
         content:
           "Search the official IALHA studbook of approved Andalusian and Lusitano horses by name, registration number, breed, sire, or dam.",
       },
-      { property: "og:title", content: "Studbook — EquestRai" },
+      { property: "og:title", content: "Studbook — Equestrai" },
       {
         property: "og:description",
         content: "Search the official IALHA studbook.",

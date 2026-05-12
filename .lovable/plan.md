@@ -1,4 +1,4 @@
-# EquestRai — IALHA Equestrian Registry Scaffold
+# Equestrai — IALHA Equestrian Registry Scaffold
 
 A React + TypeScript app on the existing TanStack Start + Tailwind v4 stack, branded for IALHA, with Lovable Cloud (Supabase) wired up and all placeholder routes/layout in place. This plan covers the foundation only — no real auth flows, registry logic, or chat behavior yet (those become follow-ups).
 
@@ -24,8 +24,8 @@ No tables yet. Auth schema decisions (profiles table, roles) will be made when l
 
 ## 3. Layout components (`src/components/layout/`)
 
-- `SiteHeader.tsx` — navy bar, gold "EquestRai" wordmark + IALHA logo placeholder (square cream tile) on the left; nav links Home / Studbook / Login / Sign Up; mobile hamburger using shadcn `Sheet`; notification bell (`Bell` icon) with a gold badge showing a hardcoded unread count for now.
-- `SiteFooter.tsx` — navy background, three columns: contact (address, phone, email `mailto:`), social icon row (Facebook/Instagram/X placeholders linking to `#`), "Powered by EquestRai" tagline.
+- `SiteHeader.tsx` — navy bar, gold "Equestrai" wordmark + IALHA logo placeholder (square cream tile) on the left; nav links Home / Studbook / Login / Sign Up; mobile hamburger using shadcn `Sheet`; notification bell (`Bell` icon) with a gold badge showing a hardcoded unread count for now.
+- `SiteFooter.tsx` — navy background, three columns: contact (address, phone, email `mailto:`), social icon row (Facebook/Instagram/X placeholders linking to `#`), "Powered by Equestrai" tagline.
 - `PublicLayout.tsx` — header + `<Outlet />` + footer; used by marketing/auth routes.
 - `AppSidebar.tsx` + `AppLayout.tsx` — shadcn `Sidebar` (collapsible="icon") with items Dashboard, My Horses, Register, Transfer, Profile, Chat, plus an Admin section. Header (with bell) stays on top; sidebar on the left; main content in the middle. Active route highlighted via `useRouterState`.
 
@@ -57,7 +57,7 @@ No auth gating yet — sidebar routes are reachable directly so the structure is
 
 ## 5. Root route updates (`src/routes/__root.tsx`)
 
-- Add Google Fonts links + IALHA-flavored default meta (`title: "EquestRai — IALHA Registry"`, description, og tags).
+- Add Google Fonts links + IALHA-flavored default meta (`title: "Equestrai — IALHA Registry"`, description, og tags).
 - Keep the existing 404 / error components but restyle them with the new tokens (navy headings, gold buttons).
 
 ## 6. Out of scope for this turn

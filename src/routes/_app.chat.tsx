@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_app/chat")({
   head: () => ({
     meta: [
-      { title: "AI Chat — EquestRai" },
+      { title: "AI Chat — Equestrai" },
       { name: "description", content: "Chat with the IALHA member-support assistant." },
     ],
   }),
@@ -27,7 +27,7 @@ function ChatPage() {
     {
       role: "assistant",
       content:
-        "Hi! I'm the EquestRai member assistant. Ask me about registrations, transfers, fees, or the studbook.",
+        "Hi! I'm the Equestrai member assistant. Ask me about registrations, transfers, fees, or the studbook.",
     },
   ]);
   const [input, setInput] = useState("");

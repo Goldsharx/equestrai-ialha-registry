@@ -7,13 +7,13 @@ import heroImage from "@/assets/hero-andalusian.jpg";
 export const Route = createFileRoute("/_public/")({
   head: () => ({
     meta: [
-      { title: "EquestRai — IALHA Equestrian Registry" },
+      { title: "Equestrai — IALHA Equestrian Registry" },
       {
         name: "description",
         content:
           "The official IALHA registry. Register horses, search the studbook, and join a community preserving the Andalusian and Lusitano breeds since 1979.",
       },
-      { property: "og:title", content: "EquestRai — IALHA Equestrian Registry" },
+      { property: "og:title", content: "Equestrai — IALHA Equestrian Registry" },
       {
         property: "og:description",
         content:

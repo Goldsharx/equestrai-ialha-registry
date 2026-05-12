@@ -42,7 +42,7 @@ function ToneIcon({ tone }: { tone: "info" | "success" | "warning" }) {
 export const Route = createFileRoute("/_app/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — EquestRai" },
+      { title: "Notifications — Equestrai" },
       { name: "description", content: "Your IALHA registry notifications." },
     ],
   }),

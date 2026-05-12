@@ -31,7 +31,7 @@ const ADD_ONS = [
 ];
 
 export const Route = createFileRoute("/_app/admin/fees")({
-  head: () => ({ meta: [{ title: "Fees — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Fees — Equestrai" }] }),
   component: AdminFees,
 });
 

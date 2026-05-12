@@ -4,7 +4,7 @@ import { RegisterWizardPage } from "@/components/RegisterWizardPage";
 export const Route = createFileRoute("/_app/register")({
   head: () => ({
     meta: [
-      { title: "Register a Horse — EquestRai" },
+      { title: "Register a Horse — Equestrai" },
       { name: "description", content: "Submit a new IALHA horse registration." },
     ],
   }),
