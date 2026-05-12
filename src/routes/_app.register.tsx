@@ -993,42 +993,25 @@ function StepReview({
   submitting: boolean;
   update: (p: Partial<WizardData>) => void;
 }) {
-  const { data: feeRows = [] } = useQuery({
-    queryKey: ["fee_schedule"],
+  const { data: feeResp, isLoading: feeLoading } = useQuery({
+    queryKey: ["calculate-fees", data.type, data.birth_date?.toISOString() ?? null, data.add_ons.join(",")],
+    enabled: !!data.type,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fee_schedule")
-        .select("code,description,amount");
+      const { data: res, error } = await supabase.functions.invoke("calculate-fees", {
+        body: {
+          registration_type: data.type,
+          horse_birth_date: data.birth_date ? format(data.birth_date, "yyyy-MM-dd") : null,
+          membership_type: "member",
+          add_ons: data.add_ons,
+        },
+      });
       if (error) throw error;
-      return data ?? [];
+      return res as { line_items: { label: string; amount: number }[]; total: number };
     },
   });
 
-  const fees = useMemo(() => {
-    const items: { description: string; amount: number }[] = [];
-    const codeMap = new Map(feeRows.map((f) => [f.code, f]));
-    const baseCode = data.type
-      ? `reg_${data.type}`
-      : null;
-    if (baseCode && codeMap.get(baseCode)) {
-      const f = codeMap.get(baseCode)!;
-      items.push({ description: f.description, amount: Number(f.amount) });
-    }
-    if (data.birth_date) {
-      const ageYears = (Date.now() - data.birth_date.getTime()) / (365.25 * 86400000);
-      if (ageYears > 2 && codeMap.get("late_fee")) {
-        const f = codeMap.get("late_fee")!;
-        items.push({ description: f.description, amount: Number(f.amount) });
-      }
-    }
-    for (const code of data.add_ons) {
-      const f = codeMap.get(code);
-      if (f) items.push({ description: f.description, amount: Number(f.amount) });
-    }
-    return items;
-  }, [feeRows, data.type, data.birth_date, data.add_ons]);
-
-  const total = fees.reduce((s, f) => s + f.amount, 0);
+  const fees = (feeResp?.line_items ?? []).map((l) => ({ description: l.label, amount: Number(l.amount) }));
+  const total = feeResp?.total ?? 0;
 
   const toggleAddon = (code: string) => {
     const next = data.add_ons.includes(code)
