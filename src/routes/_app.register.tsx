@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_app/register")({
   component: RegisterWizardPage,
 });
 
+export { RegisterWizardPage };
+
 type RegistrationType = "purebred_ialha" | "purebred_foreign" | "half_bred";
 
 type WizardData = {
@@ -117,15 +119,58 @@ const STEPS = [
 
 const COLORS = ["Bay", "Black", "Gray", "Chestnut", "Palomino", "Buckskin", "Dun", "Cremello", "Perlino", "Other"];
 
-function RegisterWizardPage() {
+function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?: string } = {}) {
   const user = useUser();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<WizardData>(EMPTY);
-  const [registrationId, setRegistrationId] = useState<string | null>(null);
+  const [registrationId, setRegistrationId] = useState<string | null>(initialRegistrationId ?? null);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [markingsBlob, setMarkingsBlob] = useState<Blob | null>(null);
+
+  useEffect(() => {
+    if (!initialRegistrationId) return;
+    let cancelled = false;
+    (async () => {
+      const { data: row, error } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("id", initialRegistrationId)
+        .maybeSingle();
+      if (error || !row || cancelled) return;
+      setRegistrationId(row.id);
+      setData({
+        type: (row.type as RegistrationType) ?? null,
+        name_choice_1: row.name_choice_1 ?? "",
+        name_choice_2: row.name_choice_2 ?? "",
+        name_choice_3: row.name_choice_3 ?? "",
+        birth_date: row.birth_date ? new Date(row.birth_date) : null,
+        sex: row.sex ?? "",
+        color: row.color ?? "",
+        birth_country: row.birth_country ?? "US",
+        microchip_number: row.microchip_number ?? "",
+        dna_case_number: row.dna_case_number ?? "",
+        sire_id: row.sire_id ?? null,
+        sire_name: row.sire_name ?? "",
+        dam_id: row.dam_id ?? null,
+        dam_name: row.dam_name ?? "",
+        foreign_registry_name: row.foreign_registry_name ?? "",
+        foreign_registration_number: row.foreign_registration_number ?? "",
+        foreign_document_path: null,
+        breeder_name: row.breeder_name ?? "",
+        breeder_contact: row.breeder_contact ?? "",
+        stallion_owner_name: row.stallion_owner_name ?? "",
+        stallion_owner_contact: row.stallion_owner_contact ?? "",
+        markings_description: row.markings_description ?? "",
+        no_markings: !!row.no_markings,
+        add_ons: Array.isArray(row.add_ons) ? (row.add_ons as string[]) : [],
+        terms_accepted: !!row.terms_accepted,
+      });
+      if (row.type) setStep(2);
+    })();
+    return () => { cancelled = true; };
+  }, [initialRegistrationId]);
 
   const update = (patch: Partial<WizardData>) => setData((d) => ({ ...d, ...patch }));
 

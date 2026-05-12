@@ -40,6 +40,36 @@ const STATUS_STYLES: Record<string, string> = {
   deceased: "bg-gray-200 text-gray-700 border-gray-300",
 };
 
+const REG_STATUS_STYLES: Record<string, string> = {
+  draft: "bg-gray-100 text-gray-800 border-gray-200",
+  pending_signatures: "bg-blue-100 text-blue-800 border-blue-200",
+  pending_payment: "bg-orange-100 text-orange-900 border-orange-300",
+  submitted: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  in_review: "bg-purple-100 text-purple-800 border-purple-200",
+  needs_info: "bg-amber-100 text-amber-900 border-amber-300",
+  pending_board: "bg-violet-100 text-violet-800 border-violet-200",
+  approved: "bg-green-100 text-green-800 border-green-200",
+  rejected: "bg-red-100 text-red-800 border-red-200",
+};
+
+const REG_STATUS_LABEL: Record<string, string> = {
+  draft: "Draft",
+  pending_signatures: "Pending Signatures",
+  pending_payment: "Pending Payment",
+  submitted: "Submitted",
+  in_review: "In Review",
+  needs_info: "Needs Info",
+  pending_board: "Pending Board",
+  approved: "Approved",
+  rejected: "Rejected",
+};
+
+const TYPE_LABEL: Record<string, string> = {
+  purebred_ialha: "Purebred (IALHA)",
+  purebred_foreign: "Purebred (Foreign)",
+  half_bred: "Half-Bred",
+};
+
 function HorsesPage() {
   const user = useUser();
   const navigate = useNavigate();
@@ -55,6 +85,21 @@ function HorsesPage() {
         .select("id,name,registration_number,breed,sex,status")
         .eq("current_owner_id", user!.id)
         .order("name", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: pending = [], isLoading: pendingLoading } = useQuery({
+    queryKey: ["registrations", "mine", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("registrations")
+        .select("id,name_choice_1,horse_name,type,status,created_at,horse_id")
+        .eq("applicant_id", user!.id)
+        .neq("status", "approved")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -164,6 +209,59 @@ function HorsesPage() {
             </TableBody>
           </Table>
         )}
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-serif text-2xl text-primary">Pending Applications</h2>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Drafts and registrations still working their way through review.
+        </p>
+        <div className="rounded-lg border bg-card">
+          {pendingLoading ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">Loading applications…</div>
+          ) : pending.length === 0 ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No pending applications. Start one from “Register a Horse”.
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Horse Name</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pending.map((r) => {
+                  const name = r.horse_name || r.name_choice_1 || "Untitled draft";
+                  const type = r.type ? (TYPE_LABEL[r.type] ?? r.type) : "—";
+                  const status = r.status as string;
+                  return (
+                    <TableRow
+                      key={r.id}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        navigate({
+                          to: "/register/$registrationId/edit",
+                          params: { registrationId: r.id },
+                        })
+                      }
+                    >
+                      <TableCell className="font-medium">{name}</TableCell>
+                      <TableCell>{type}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={REG_STATUS_STYLES[status] ?? ""}>
+                          {REG_STATUS_LABEL[status] ?? status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </div>
       </div>
     </div>
   );

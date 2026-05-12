@@ -35,6 +35,7 @@ import { Route as AppAdminActivityRouteImport } from './routes/_app.admin.activi
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
 import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
 import { Route as AppRegisterRegistrationIdPayRouteImport } from './routes/_app.register.$registrationId.pay'
+import { Route as AppRegisterRegistrationIdEditRouteImport } from './routes/_app.register.$registrationId.edit'
 import { Route as AppAdminTransfersTransferIdRouteImport } from './routes/_app.admin.transfers.$transferId'
 import { Route as AppAdminRegistrationsRegistrationIdRouteImport } from './routes/_app.admin.registrations.$registrationId'
 
@@ -169,6 +170,12 @@ const AppRegisterRegistrationIdPayRoute =
     path: '/$registrationId/pay',
     getParentRoute: () => AppRegisterRoute,
   } as any)
+const AppRegisterRegistrationIdEditRoute =
+  AppRegisterRegistrationIdEditRouteImport.update({
+    id: '/$registrationId/edit',
+    path: '/$registrationId/edit',
+    getParentRoute: () => AppRegisterRoute,
+  } as any)
 const AppAdminTransfersTransferIdRoute =
   AppAdminTransfersTransferIdRouteImport.update({
     id: '/$transferId',
@@ -206,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
   '/admin/transfers/$transferId': typeof AppAdminTransfersTransferIdRoute
+  '/register/$registrationId/edit': typeof AppRegisterRegistrationIdEditRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -234,6 +242,7 @@ export interface FileRoutesByTo {
   '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
   '/admin/transfers/$transferId': typeof AppAdminTransfersTransferIdRoute
+  '/register/$registrationId/edit': typeof AppRegisterRegistrationIdEditRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -265,6 +274,7 @@ export interface FileRoutesById {
   '/_public/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/_app/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
   '/_app/admin/transfers/$transferId': typeof AppAdminTransfersTransferIdRoute
+  '/_app/register/$registrationId/edit': typeof AppRegisterRegistrationIdEditRoute
   '/_app/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/_app/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/_app/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/studbook/$horseId'
     | '/admin/registrations/$registrationId'
     | '/admin/transfers/$transferId'
+    | '/register/$registrationId/edit'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/studbook/$horseId'
     | '/admin/registrations/$registrationId'
     | '/admin/transfers/$transferId'
+    | '/register/$registrationId/edit'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -353,6 +365,7 @@ export interface FileRouteTypes {
     | '/_public/studbook/$horseId'
     | '/_app/admin/registrations/$registrationId'
     | '/_app/admin/transfers/$transferId'
+    | '/_app/register/$registrationId/edit'
     | '/_app/register/$registrationId/pay'
     | '/_app/register/$registrationId/status'
     | '/_app/transfer/$transferId/pay'
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRegisterRegistrationIdPayRouteImport
       parentRoute: typeof AppRegisterRoute
     }
+    '/_app/register/$registrationId/edit': {
+      id: '/_app/register/$registrationId/edit'
+      path: '/$registrationId/edit'
+      fullPath: '/register/$registrationId/edit'
+      preLoaderRoute: typeof AppRegisterRegistrationIdEditRouteImport
+      parentRoute: typeof AppRegisterRoute
+    }
     '/_app/admin/transfers/$transferId': {
       id: '/_app/admin/transfers/$transferId'
       path: '/$transferId'
@@ -628,11 +648,13 @@ const AppHorsesRouteWithChildren = AppHorsesRoute._addFileChildren(
 )
 
 interface AppRegisterRouteChildren {
+  AppRegisterRegistrationIdEditRoute: typeof AppRegisterRegistrationIdEditRoute
   AppRegisterRegistrationIdPayRoute: typeof AppRegisterRegistrationIdPayRoute
   AppRegisterRegistrationIdStatusRoute: typeof AppRegisterRegistrationIdStatusRoute
 }
 
 const AppRegisterRouteChildren: AppRegisterRouteChildren = {
+  AppRegisterRegistrationIdEditRoute: AppRegisterRegistrationIdEditRoute,
   AppRegisterRegistrationIdPayRoute: AppRegisterRegistrationIdPayRoute,
   AppRegisterRegistrationIdStatusRoute: AppRegisterRegistrationIdStatusRoute,
 }
