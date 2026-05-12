@@ -1081,9 +1081,14 @@ function StepReview({
       <Card>
         <CardHeader><CardTitle className="font-serif text-primary">Fee Breakdown</CardTitle></CardHeader>
         <CardContent>
+          {feeLoading ? (
+            <p className="py-4 text-sm text-muted-foreground"><Loader2 className="mr-2 inline h-3 w-3 animate-spin" />Calculating fees…</p>
+          ) : (
           <table className="w-full text-sm">
             <tbody>
-              {fees.map((f, i) => (
+              {fees.length === 0 ? (
+                <tr><td colSpan={2} className="py-2 text-muted-foreground">No fees configured.</td></tr>
+              ) : fees.map((f, i) => (
                 <tr key={i} className="border-b last:border-0">
                   <td className="py-2">{f.description}</td>
                   <td className="py-2 text-right">${f.amount.toFixed(2)}</td>
