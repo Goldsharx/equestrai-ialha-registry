@@ -25,6 +25,7 @@ import { Route as AppChatRouteImport } from './routes/_app.chat'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppHorsesHorseIdRouteImport } from './routes/_app.horses.$horseId'
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
+import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
 import { Route as AppRegisterRegistrationIdPayRouteImport } from './routes/_app.register.$registrationId.pay'
 
 const SignupRoute = SignupRouteImport.update({
@@ -106,6 +107,12 @@ const AppTransferTransferIdPayRoute =
     path: '/$transferId/pay',
     getParentRoute: () => AppTransferRoute,
   } as any)
+const AppRegisterRegistrationIdStatusRoute =
+  AppRegisterRegistrationIdStatusRouteImport.update({
+    id: '/$registrationId/status',
+    path: '/$registrationId/status',
+    getParentRoute: () => AppRegisterRoute,
+  } as any)
 const AppRegisterRegistrationIdPayRoute =
   AppRegisterRegistrationIdPayRouteImport.update({
     id: '/$registrationId/pay',
@@ -128,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/studbook': typeof PublicStudbookRoute
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
+  '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
 }
 export interface FileRoutesByTo {
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/studbook': typeof PublicStudbookRoute
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
+  '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
 }
 export interface FileRoutesById {
@@ -165,6 +174,7 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_app/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/_app/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
+  '/_app/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/_app/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
 }
 export interface FileRouteTypes {
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/studbook'
     | '/horses/$horseId'
     | '/register/$registrationId/pay'
+    | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/studbook'
     | '/horses/$horseId'
     | '/register/$registrationId/pay'
+    | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
   id:
     | '__root__'
@@ -220,6 +232,7 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_app/horses/$horseId'
     | '/_app/register/$registrationId/pay'
+    | '/_app/register/$registrationId/status'
     | '/_app/transfer/$transferId/pay'
   fileRoutesById: FileRoutesById
 }
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTransferTransferIdPayRouteImport
       parentRoute: typeof AppTransferRoute
     }
+    '/_app/register/$registrationId/status': {
+      id: '/_app/register/$registrationId/status'
+      path: '/$registrationId/status'
+      fullPath: '/register/$registrationId/status'
+      preLoaderRoute: typeof AppRegisterRegistrationIdStatusRouteImport
+      parentRoute: typeof AppRegisterRoute
+    }
     '/_app/register/$registrationId/pay': {
       id: '/_app/register/$registrationId/pay'
       path: '/$registrationId/pay'
@@ -368,10 +388,12 @@ const AppHorsesRouteWithChildren = AppHorsesRoute._addFileChildren(
 
 interface AppRegisterRouteChildren {
   AppRegisterRegistrationIdPayRoute: typeof AppRegisterRegistrationIdPayRoute
+  AppRegisterRegistrationIdStatusRoute: typeof AppRegisterRegistrationIdStatusRoute
 }
 
 const AppRegisterRouteChildren: AppRegisterRouteChildren = {
   AppRegisterRegistrationIdPayRoute: AppRegisterRegistrationIdPayRoute,
+  AppRegisterRegistrationIdStatusRoute: AppRegisterRegistrationIdStatusRoute,
 }
 
 const AppRegisterRouteWithChildren = AppRegisterRoute._addFileChildren(
