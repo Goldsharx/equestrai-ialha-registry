@@ -137,6 +137,7 @@ export type Database = {
           dam_name: string | null
           date_of_birth: string | null
           dna_status: string | null
+          fts: unknown
           id: string
           markings_description: string | null
           markings_image_url: string | null
@@ -161,6 +162,7 @@ export type Database = {
           dam_name?: string | null
           date_of_birth?: string | null
           dna_status?: string | null
+          fts?: unknown
           id?: string
           markings_description?: string | null
           markings_image_url?: string | null
@@ -185,6 +187,7 @@ export type Database = {
           dam_name?: string | null
           date_of_birth?: string | null
           dna_status?: string | null
+          fts?: unknown
           id?: string
           markings_description?: string | null
           markings_image_url?: string | null
