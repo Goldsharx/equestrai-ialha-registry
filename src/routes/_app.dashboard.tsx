@@ -181,10 +181,14 @@ function DashboardPage() {
               {registrationsQuery.data.items.map((r) => {
                 const key = (r.status as StatusKey) ?? "draft";
                 const cls = statusClasses[key] ?? statusClasses.draft;
+                const isDraft = key === "draft";
+                const linkProps = isDraft
+                  ? { to: "/register/$registrationId/edit" as const, params: { registrationId: r.id } }
+                  : { to: "/register/$registrationId/status" as const, params: { registrationId: r.id } };
                 return (
                   <li key={r.id}>
                     <Link
-                      to="/register"
+                      {...linkProps}
                       className="flex items-center justify-between gap-3 py-2.5 text-sm hover:text-accent-foreground"
                     >
                       <span className="truncate font-medium">
