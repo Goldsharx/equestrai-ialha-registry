@@ -945,14 +945,15 @@ function StepPhotosMarkings({
 
           {!data.no_markings && (
             <>
-              <div className="flex h-48 items-center justify-center rounded-md border-2 border-dashed border-secondary/40 bg-cream/50 text-sm text-muted-foreground">
-                <div className="text-center">
-                  <p className="font-serif text-lg text-primary">Digital Markings Canvas</p>
-                  <p className="text-xs">Draw your horse's markings here</p>
-                </div>
-              </div>
+              <MarkingsCanvas
+                initialUrl={photos.find((p) => p.photo_type === "markings")?.url}
+                onSave={async (blob) => {
+                  const file = new File([blob], "markings.png", { type: "image/png" });
+                  await handleUpload("markings", file);
+                }}
+              />
               <Textarea
-                placeholder="Describe markings (e.g., star on forehead, white left hind sock)…"
+                placeholder="Or describe markings (e.g., star on forehead, white left hind sock)…"
                 value={data.markings_description}
                 maxLength={1000}
                 onChange={(e) => update({ markings_description: e.target.value })}
