@@ -57,6 +57,10 @@ type WizardData = {
   breeder_contact: string;
   stallion_owner_name: string;
   stallion_owner_contact: string;
+  markings_description: string;
+  no_markings: boolean;
+  add_ons: string[];
+  terms_accepted: boolean;
 };
 
 const EMPTY: WizardData = {
@@ -81,7 +85,26 @@ const EMPTY: WizardData = {
   breeder_contact: "",
   stallion_owner_name: "",
   stallion_owner_contact: "",
+  markings_description: "",
+  no_markings: false,
+  add_ons: [],
+  terms_accepted: false,
 };
+
+const PHOTO_SLOTS: { code: string; label: string; required: boolean }[] = [
+  { code: "left", label: "Left Side", required: true },
+  { code: "right", label: "Right Side", required: true },
+  { code: "front", label: "Front", required: true },
+  { code: "rear", label: "Rear", required: true },
+  { code: "brand", label: "Brand", required: false },
+  { code: "other", label: "Other", required: false },
+];
+
+const ADDONS = [
+  { code: "addon_dna_kit", label: "DNA Kit", amount: 50 },
+  { code: "addon_microchip", label: "Microchip", amount: 75 },
+  { code: "addon_expedited", label: "Expedited Processing", amount: 100 },
+];
 
 const STEPS = [
   { id: 1, label: "Type" },
