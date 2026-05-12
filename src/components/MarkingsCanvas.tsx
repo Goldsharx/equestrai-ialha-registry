@@ -58,10 +58,10 @@ type Stroke = { color: string; size: number; points: { x: number; y: number }[] 
 
 export function MarkingsCanvas({
   initialUrl,
-  onSave,
+  onChange,
 }: {
   initialUrl?: string | null;
-  onSave: (blob: Blob) => Promise<void> | void;
+  onChange: (blob: Blob | null) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -70,7 +70,6 @@ export function MarkingsCanvas({
   const drawingRef = useRef<Stroke | null>(null);
   const [color, setColor] = useState(COLORS[0].value);
   const [size, setSize] = useState(SIZES[1].value);
-  const [saving, setSaving] = useState(false);
 
   // Load background silhouette once.
   useEffect(() => {
@@ -151,39 +150,32 @@ export function MarkingsCanvas({
     drawingRef.current.points.push(pointFromEvent(e));
     redraw();
   }
-  async function onPointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
+  function onPointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!drawingRef.current) return;
     canvasRef.current?.releasePointerCapture(e.pointerId);
     const finished = drawingRef.current;
     drawingRef.current = null;
     const next = [...strokes, finished];
     setStrokes(next);
-    // Persist after stroke completes.
-    await persist();
+    setTimeout(emitCanvasChange, 0);
   }
 
-  async function persist() {
+  function emitCanvasChange() {
     const c = canvasRef.current;
     if (!c) return;
-    setSaving(true);
-    try {
-      const blob: Blob | null = await new Promise((resolve) =>
-        c.toBlob((b) => resolve(b), "image/png"),
-      );
-      if (blob) await onSave(blob);
-    } finally {
-      setSaving(false);
-    }
+    c.toBlob((blob) => onChange(blob), "image/png");
   }
 
   function undo() {
-    setStrokes((s) => s.slice(0, -1));
-    // Persist after a tick so canvas reflects new state.
-    setTimeout(persist, 0);
+    setStrokes((s) => {
+      const next = s.slice(0, -1);
+      setTimeout(() => (next.length ? emitCanvasChange() : onChange(null)), 0);
+      return next;
+    });
   }
   function clearAll() {
     setStrokes([]);
-    setTimeout(persist, 0);
+    setTimeout(() => onChange(null), 0);
   }
 
   return (
@@ -258,7 +250,7 @@ export function MarkingsCanvas({
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        {saving ? "Saving drawing…" : "Draw markings directly on the horse outline. Changes save automatically."}
+        Draw markings directly on the horse outline. The drawing saves with the registration.
         {initialUrl && !strokes.length ? " A previously saved drawing exists." : ""}
       </p>
     </div>
