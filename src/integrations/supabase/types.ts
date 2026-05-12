@@ -280,6 +280,8 @@ export type Database = {
       registrations: {
         Row: {
           add_ons: Json
+          ai_screening_notes: string | null
+          ai_screening_score: number | null
           applicant_id: string
           birth_country: string | null
           birth_date: string | null
@@ -290,6 +292,8 @@ export type Database = {
           dam_id: string | null
           dam_name: string | null
           dna_case_number: string | null
+          fee_breakdown: Json
+          fee_total: number | null
           foreign_registration_number: string | null
           foreign_registry_name: string | null
           horse_id: string | null
@@ -301,6 +305,8 @@ export type Database = {
           name_choice_2: string | null
           name_choice_3: string | null
           no_markings: boolean
+          payment_status: string
+          reviewer_notes: string | null
           sex: string | null
           sire_id: string | null
           sire_name: string | null
@@ -314,6 +320,8 @@ export type Database = {
         }
         Insert: {
           add_ons?: Json
+          ai_screening_notes?: string | null
+          ai_screening_score?: number | null
           applicant_id: string
           birth_country?: string | null
           birth_date?: string | null
@@ -324,6 +332,8 @@ export type Database = {
           dam_id?: string | null
           dam_name?: string | null
           dna_case_number?: string | null
+          fee_breakdown?: Json
+          fee_total?: number | null
           foreign_registration_number?: string | null
           foreign_registry_name?: string | null
           horse_id?: string | null
@@ -335,6 +345,8 @@ export type Database = {
           name_choice_2?: string | null
           name_choice_3?: string | null
           no_markings?: boolean
+          payment_status?: string
+          reviewer_notes?: string | null
           sex?: string | null
           sire_id?: string | null
           sire_name?: string | null
@@ -348,6 +360,8 @@ export type Database = {
         }
         Update: {
           add_ons?: Json
+          ai_screening_notes?: string | null
+          ai_screening_score?: number | null
           applicant_id?: string
           birth_country?: string | null
           birth_date?: string | null
@@ -358,6 +372,8 @@ export type Database = {
           dam_id?: string | null
           dam_name?: string | null
           dna_case_number?: string | null
+          fee_breakdown?: Json
+          fee_total?: number | null
           foreign_registration_number?: string | null
           foreign_registry_name?: string | null
           horse_id?: string | null
@@ -369,6 +385,8 @@ export type Database = {
           name_choice_2?: string | null
           name_choice_3?: string | null
           no_markings?: boolean
+          payment_status?: string
+          reviewer_notes?: string | null
           sex?: string | null
           sire_id?: string | null
           sire_name?: string | null
@@ -390,6 +408,50 @@ export type Database = {
           },
         ]
       }
+      signatures: {
+        Row: {
+          created_at: string
+          id: string
+          registration_id: string
+          role: string
+          signed_at: string | null
+          signer_email: string | null
+          signer_name: string
+          signer_user_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          registration_id: string
+          role: string
+          signed_at?: string | null
+          signer_email?: string | null
+          signer_name: string
+          signer_user_id?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          registration_id?: string
+          role?: string
+          signed_at?: string | null
+          signer_email?: string | null
+          signer_name?: string
+          signer_user_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signatures_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transfers: {
         Row: {
           buyer_address: string | null
@@ -397,12 +459,14 @@ export type Database = {
           buyer_phone: string | null
           created_at: string
           fee_amount: number | null
+          fee_breakdown: Json
           from_owner_id: string | null
           from_owner_name: string | null
           horse_id: string
           id: string
           is_gelded_at_transfer: boolean
           notes: string | null
+          payment_status: string
           sale_date: string | null
           status: string
           to_owner_id: string | null
@@ -415,12 +479,14 @@ export type Database = {
           buyer_phone?: string | null
           created_at?: string
           fee_amount?: number | null
+          fee_breakdown?: Json
           from_owner_id?: string | null
           from_owner_name?: string | null
           horse_id: string
           id?: string
           is_gelded_at_transfer?: boolean
           notes?: string | null
+          payment_status?: string
           sale_date?: string | null
           status?: string
           to_owner_id?: string | null
@@ -433,12 +499,14 @@ export type Database = {
           buyer_phone?: string | null
           created_at?: string
           fee_amount?: number | null
+          fee_breakdown?: Json
           from_owner_id?: string | null
           from_owner_name?: string | null
           horse_id?: string
           id?: string
           is_gelded_at_transfer?: boolean
           notes?: string | null
+          payment_status?: string
           sale_date?: string | null
           status?: string
           to_owner_id?: string | null
