@@ -1005,7 +1005,11 @@ function StepPhotosMarkings({
           <label className="flex items-center gap-2">
             <Checkbox
               checked={data.no_markings}
-              onCheckedChange={(c) => update({ no_markings: !!c, markings_description: c ? "NONE" : "" })}
+              onCheckedChange={(c) => {
+                const checked = !!c;
+                if (checked) onMarkingsChange(null);
+                update({ no_markings: checked, markings_description: checked ? "NONE" : "" });
+              }}
             />
             <span className="text-sm">This horse has no markings</span>
           </label>
@@ -1116,6 +1120,7 @@ function StepReview({
   submitting,
   update,
   registrationId,
+  markingsBlob,
 }: {
   data: WizardData;
   onSaveDraft: () => void;
@@ -1124,6 +1129,7 @@ function StepReview({
   submitting: boolean;
   update: (p: Partial<WizardData>) => void;
   registrationId: string | null;
+  markingsBlob: Blob | null;
 }) {
   const { data: markingsPhoto } = useQuery({
     queryKey: ["markings-photo", registrationId],
