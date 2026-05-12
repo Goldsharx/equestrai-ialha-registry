@@ -420,17 +420,17 @@ function StepDetails({
         <Field label="Birth Date" htmlFor="dob">
           <Popover>
             <PopoverTrigger asChild>
-              <Button
+              <button
                 id="dob"
-                variant="outline"
+                type="button"
                 className={cn(
-                  "h-10 w-full justify-between text-left font-normal",
+                  "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   !data.birth_date && "text-muted-foreground",
                 )}
               >
-                <span>{data.birth_date ? format(data.birth_date, "PPP") : "Pick a date"}</span>
+                <span>{data.birth_date ? format(data.birth_date, "PPP") : "Select birth date"}</span>
                 <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-              </Button>
+              </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
