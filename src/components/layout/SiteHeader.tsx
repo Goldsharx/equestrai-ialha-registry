@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/layout/NotificationBell";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/studbook", label: "Studbook" },
 ];
 
-export function SiteHeader({ unreadCount = 0 }: { unreadCount?: number }) {
+export function SiteHeader(_props: { unreadCount?: number } = {}) {
   const [open, setOpen] = useState(false);
+  const { session } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full bg-primary text-primary-foreground shadow-sm">
@@ -41,18 +44,7 @@ export function SiteHeader({ unreadCount = 0 }: { unreadCount?: number }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            to="/notifications"
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
-            aria-label="Notifications"
-          >
-            <Bell className="h-5 w-5" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </Link>
+          {session && <NotificationBell />}
 
           <div className="hidden md:flex md:items-center md:gap-2">
             <Button asChild variant="ghost" className="text-primary-foreground hover:bg-white/10 hover:text-accent">
