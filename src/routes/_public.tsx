@@ -1,0 +1,19 @@
+import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+
+export const Route = createFileRoute("/_public")({
+  component: PublicLayout,
+});
+
+function PublicLayout() {
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <SiteHeader unreadCount={0} />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}

@@ -1,0 +1,111 @@
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Bell, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const navLinks = [
+  { to: "/", label: "Home" },
+  { to: "/studbook", label: "Studbook" },
+];
+
+export function SiteHeader({ unreadCount = 0 }: { unreadCount?: number }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <header className="sticky top-0 z-40 w-full bg-primary text-primary-foreground shadow-sm">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-cream text-navy font-heading text-lg font-bold">
+            I
+          </div>
+          <div className="leading-tight">
+            <div className="font-heading text-lg font-semibold text-accent">EquestRai</div>
+            <div className="text-[10px] uppercase tracking-widest text-primary-foreground/70">
+              IALHA Registry
+            </div>
+          </div>
+        </Link>
+
+        <nav className="hidden items-center gap-8 md:flex">
+          {navLinks.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="text-sm font-medium text-primary-foreground/90 transition-colors hover:text-accent"
+              activeProps={{ className: "text-accent" }}
+              activeOptions={{ exact: l.to === "/" }}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <Link
+            to="/notifications"
+            className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
+            aria-label="Notifications"
+          >
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </Link>
+
+          <div className="hidden md:flex md:items-center md:gap-2">
+            <Button asChild variant="ghost" className="text-primary-foreground hover:bg-white/10 hover:text-accent">
+              <Link to="/login">Login</Link>
+            </Button>
+            <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Link to="/signup">Sign Up</Link>
+            </Button>
+          </div>
+
+          <button
+            type="button"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary-foreground hover:bg-white/10 md:hidden"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="border-t border-white/10 bg-primary md:hidden">
+          <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3">
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setOpen(false)}
+                className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
+                activeProps={{ className: "text-accent" }}
+                activeOptions={{ exact: l.to === "/" }}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              onClick={() => setOpen(false)}
+              className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground"
+            >
+              Sign Up
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
