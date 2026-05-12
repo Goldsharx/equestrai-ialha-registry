@@ -125,6 +125,7 @@ function RegisterWizardPage() {
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [markingsBlob, setMarkingsBlob] = useState<Blob | null>(null);
 
   const update = (patch: Partial<WizardData>) => setData((d) => ({ ...d, ...patch }));
 
@@ -158,18 +159,45 @@ function RegisterWizardPage() {
     terms_accepted: next.terms_accepted,
   });
 
-  const persist = async (next: WizardData): Promise<string | null> => {
+  const uploadMarkingsCanvas = async (regId: string, blob: Blob) => {
+    if (!user?.id) throw new Error("You must be logged in to save markings");
+    console.log("[markings-canvas] uploading drawing", { registration_id: regId });
+    const path = `${user.id}/registration-${regId}/markings-${Date.now()}.png`;
+    const { error: upErr } = await supabase.storage
+      .from("photos")
+      .upload(path, blob, { contentType: "image/png", upsert: true });
+    if (upErr) throw upErr;
+
+    const { data: pub } = supabase.storage.from("photos").getPublicUrl(path);
+    const { error: deleteErr } = await supabase
+      .from("horse_photos")
+      .delete()
+      .eq("registration_id", regId)
+      .eq("photo_type", "markings");
+    if (deleteErr) throw deleteErr;
+
+    const { error: insErr } = await supabase.from("horse_photos").insert({
+      registration_id: regId,
+      url: pub.publicUrl,
+      photo_type: "markings",
+    });
+    if (insErr) throw insErr;
+    setMarkingsBlob(null);
+    console.log("[markings-canvas] drawing saved", { registration_id: regId });
+  };
+
+  const persist = async (next: WizardData, options: { saveMarkings?: boolean } = {}): Promise<string | null> => {
     if (!user?.id) return null;
     setSaving(true);
     try {
       const payload = buildPayload(next);
+      let savedId = registrationId;
       if (registrationId) {
         const { error } = await supabase
           .from("registrations")
           .update(payload)
           .eq("id", registrationId);
         if (error) throw error;
-        return registrationId;
       } else {
         const { data: row, error } = await supabase
           .from("registrations")
@@ -177,9 +205,13 @@ function RegisterWizardPage() {
           .select("id")
           .single();
         if (error) throw error;
+        savedId = row.id;
         setRegistrationId(row.id);
-        return row.id;
       }
+      if (savedId && options.saveMarkings && markingsBlob && !next.no_markings) {
+        await uploadMarkingsCanvas(savedId, markingsBlob);
+      }
+      return savedId;
     } catch (err) {
       console.error(err);
       toast.error("Couldn't save draft");
@@ -190,14 +222,15 @@ function RegisterWizardPage() {
   };
 
   const goNext = async () => {
-    await persist(data);
+    const id = await persist(data, { saveMarkings: step === 4 });
+    if (step === 4 && !id) return;
     setStep((s) => Math.min(STEPS.length, s + 1));
   };
 
   const goBack = () => setStep((s) => Math.max(1, s - 1));
 
   const handleSaveDraft = async () => {
-    const id = await persist(data);
+    const id = await persist(data, { saveMarkings: true });
     if (id) {
       toast.success("Draft saved");
       navigate({ to: "/dashboard" });
@@ -212,7 +245,7 @@ function RegisterWizardPage() {
     setSubmitting(true);
     try {
       console.log("[submit-and-pay] saving draft…");
-      const id = await persist(data);
+      const id = await persist(data, { saveMarkings: true });
       if (!id) throw new Error("Failed to save registration draft");
       console.log("[submit-and-pay] draft saved", id);
 
@@ -266,6 +299,7 @@ function RegisterWizardPage() {
           userId={user?.id}
           ensureRegistration={() => persist(data)}
           registrationId={registrationId}
+          onMarkingsChange={setMarkingsBlob}
         />
       )}
 
@@ -278,6 +312,7 @@ function RegisterWizardPage() {
           submitting={submitting}
           update={update}
           registrationId={registrationId}
+          markingsBlob={markingsBlob}
         />
       )}
 
@@ -424,11 +459,11 @@ function StepDetails({
                 id="dob"
                 type="button"
                 className={cn(
-                  "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-left text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
                   !data.birth_date && "text-muted-foreground",
                 )}
               >
-                <span>{data.birth_date ? format(data.birth_date, "PPP") : "Select birth date"}</span>
+                <span className="truncate">{data.birth_date ? format(data.birth_date, "PPP") : "Select birth date"}</span>
                 <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
               </button>
             </PopoverTrigger>
@@ -439,8 +474,8 @@ function StepDetails({
                 onSelect={(d) => update({ birth_date: d ?? null })}
                 disabled={(d) => d > new Date() || d < new Date("1990-01-01")}
                 captionLayout="dropdown"
-                fromYear={1990}
-                toYear={new Date().getFullYear()}
+                startMonth={new Date(1990, 0)}
+                endMonth={new Date(new Date().getFullYear(), 11)}
                 defaultMonth={data.birth_date ?? new Date()}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
@@ -663,12 +698,12 @@ function ParentSearch({
           <Button
             id={`p-${label}`}
             variant="outline"
-            className="h-10 w-full justify-start font-normal"
+            className="h-9 w-full justify-start px-3 text-left font-normal"
           >
-            <Search className="mr-2 h-4 w-4" /> {display}
+            <Search className="mr-2 h-4 w-4" /> <span className="truncate">{display}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-2" align="start">
+        <PopoverContent className="w-[--radix-popover-trigger-width] min-w-80 p-2" align="start">
           <Input
             placeholder="Type a name…"
             value={query}
@@ -859,12 +894,14 @@ function StepPhotosMarkings({
   userId,
   ensureRegistration,
   registrationId,
+  onMarkingsChange,
 }: {
   data: WizardData;
   update: (p: Partial<WizardData>) => void;
   userId: string | undefined;
   ensureRegistration: () => Promise<string | null>;
   registrationId: string | null;
+  onMarkingsChange: (blob: Blob | null) => void;
 }) {
   const [photos, setPhotos] = useState<PhotoRow[]>([]);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -968,7 +1005,11 @@ function StepPhotosMarkings({
           <label className="flex items-center gap-2">
             <Checkbox
               checked={data.no_markings}
-              onCheckedChange={(c) => update({ no_markings: !!c, markings_description: c ? "NONE" : "" })}
+              onCheckedChange={(c) => {
+                const checked = !!c;
+                if (checked) onMarkingsChange(null);
+                update({ no_markings: checked, markings_description: checked ? "NONE" : "" });
+              }}
             />
             <span className="text-sm">This horse has no markings</span>
           </label>
@@ -977,10 +1018,7 @@ function StepPhotosMarkings({
             <>
               <MarkingsCanvas
                 initialUrl={photos.find((p) => p.photo_type === "markings")?.url}
-                onSave={async (blob) => {
-                  const file = new File([blob], "markings.png", { type: "image/png" });
-                  await handleUpload("markings", file);
-                }}
+                onChange={onMarkingsChange}
               />
               <Textarea
                 placeholder="Or describe markings (e.g., star on forehead, white left hind sock)…"
@@ -1082,6 +1120,7 @@ function StepReview({
   submitting,
   update,
   registrationId,
+  markingsBlob,
 }: {
   data: WizardData;
   onSaveDraft: () => void;
@@ -1090,6 +1129,7 @@ function StepReview({
   submitting: boolean;
   update: (p: Partial<WizardData>) => void;
   registrationId: string | null;
+  markingsBlob: Blob | null;
 }) {
   const { data: markingsPhoto } = useQuery({
     queryKey: ["markings-photo", registrationId],
