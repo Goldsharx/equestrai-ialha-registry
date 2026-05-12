@@ -66,11 +66,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: TKey | string, vars?: Record<string, string | number>) => {
+      const k = key as string;
       const dict = translations[lang] as Record<string, string>;
-      let str = dict[key as string] ?? (translations.en as Record<string, string>)[key as string] ?? key;
+      const en = translations.en as Record<string, string>;
+      // Lookup priority: exact key, then common namespaced fallbacks (back-compat
+      // for legacy unprefixed keys like "welcomeBack" → "auth.welcomeBack").
+      const candidates = [k, `auth.${k}`, `common.${k}`, `err.${k}`, `nav.${k}`];
+      let str: string | undefined;
+      for (const c of candidates) {
+        str = dict[c] ?? en[c];
+        if (str) break;
+      }
+      if (!str) str = k;
       if (vars) {
-        for (const [k, v] of Object.entries(vars)) {
-          str = str.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+        for (const [vk, vv] of Object.entries(vars)) {
+          str = str.replace(new RegExp(`\\{${vk}\\}`, "g"), String(vv));
         }
       }
       return str;
