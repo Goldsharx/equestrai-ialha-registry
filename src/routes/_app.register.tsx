@@ -186,11 +186,19 @@ function RegisterWizardPage() {
     console.log("[markings-canvas] drawing saved", { registration_id: regId });
   };
 
-  const persist = async (next: WizardData, options: { saveMarkings?: boolean } = {}): Promise<string | null> => {
-    if (!user?.id) return null;
+  const persist = async (
+    next: WizardData,
+    options: { saveMarkings?: boolean; status?: "draft" | "pending_payment" } = {},
+  ): Promise<string | null> => {
+    if (!user?.id) {
+      console.warn("[persist] no user — cannot save");
+      toast.error("You must be signed in to save a registration");
+      return null;
+    }
     setSaving(true);
     try {
-      const payload = buildPayload(next);
+      const payload = { ...buildPayload(next), status: options.status ?? ("draft" as const) };
+      console.log("[persist] saving registration", { existingId: registrationId, status: payload.status });
       let savedId = registrationId;
       if (registrationId) {
         const { error } = await supabase
@@ -211,10 +219,12 @@ function RegisterWizardPage() {
       if (savedId && options.saveMarkings && markingsBlob && !next.no_markings) {
         await uploadMarkingsCanvas(savedId, markingsBlob);
       }
+      console.log("[persist] saved", savedId);
       return savedId;
     } catch (err) {
-      console.error(err);
-      toast.error("Couldn't save draft");
+      console.error("[persist] failed", err);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Couldn't save draft: ${message}`);
       return null;
     } finally {
       setSaving(false);
