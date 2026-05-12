@@ -888,7 +888,7 @@ function StepPhotosMarkings({
         .single();
       if (insErr) throw insErr;
       setPhotos((prev) => [...prev.filter((p) => p.photo_type !== slot), row as PhotoRow]);
-      toast.success("Photo uploaded");
+      if (slot !== "markings") toast.success("Photo uploaded");
     } catch (err) {
       console.error(err);
       toast.error("Upload failed");
