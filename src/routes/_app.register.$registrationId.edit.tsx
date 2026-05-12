@@ -1,5 +1,5 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { RegisterWizardPage } from "./_app.register";
+import { RegisterWizardPage } from "@/components/RegisterWizardPage";
 
 export const Route = createFileRoute("/_app/register/$registrationId/edit")({
   head: () => ({ meta: [{ title: "Continue Registration — EquestRai" }] }),

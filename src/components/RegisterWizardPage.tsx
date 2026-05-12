@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Check, ChevronRight, Loader2, Search, Trash2, Upload } from "lucide-react";
@@ -23,16 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MarkingsCanvas } from "@/components/MarkingsCanvas";
-
-export const Route = createFileRoute("/_app/register")({
-  head: () => ({
-    meta: [
-      { title: "Register a Horse — EquestRai" },
-      { name: "description", content: "Submit a new IALHA horse registration." },
-    ],
-  }),
-  component: RegisterWizardPage,
-});
 
 export { RegisterWizardPage };
 
