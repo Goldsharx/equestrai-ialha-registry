@@ -1138,6 +1138,15 @@ function StepReview({
               label="Markings"
               value={data.no_markings ? "None" : (data.markings_description || "—")}
             />
+            {!data.no_markings && markingsPhoto?.url && (
+              <div className="md:col-span-2 mt-2">
+                <img
+                  src={markingsPhoto.url}
+                  alt="Markings drawing"
+                  className="max-h-64 w-full rounded-md border bg-cream/30 object-contain"
+                />
+              </div>
+            )}
           </Section>
         </CardContent>
       </Card>
