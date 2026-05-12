@@ -29,6 +29,7 @@ import { Route as AppAdminRegistrationsRouteImport } from './routes/_app.admin.r
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
 import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
 import { Route as AppRegisterRegistrationIdPayRouteImport } from './routes/_app.register.$registrationId.pay'
+import { Route as AppAdminRegistrationsRegistrationIdRouteImport } from './routes/_app.admin.registrations.$registrationId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -131,6 +132,12 @@ const AppRegisterRegistrationIdPayRoute =
     path: '/$registrationId/pay',
     getParentRoute: () => AppRegisterRoute,
   } as any)
+const AppAdminRegistrationsRegistrationIdRoute =
+  AppAdminRegistrationsRegistrationIdRouteImport.update({
+    id: '/$registrationId',
+    path: '/$registrationId',
+    getParentRoute: () => AppAdminRegistrationsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -145,9 +152,10 @@ export interface FileRoutesByFullPath {
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
-  '/admin/registrations': typeof AppAdminRegistrationsRoute
+  '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
+  '/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -165,9 +173,10 @@ export interface FileRoutesByTo {
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
-  '/admin/registrations': typeof AppAdminRegistrationsRoute
+  '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
+  '/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -188,9 +197,10 @@ export interface FileRoutesById {
   '/_app/transfer': typeof AppTransferRouteWithChildren
   '/_public/studbook': typeof PublicStudbookRouteWithChildren
   '/_public/': typeof PublicIndexRoute
-  '/_app/admin/registrations': typeof AppAdminRegistrationsRoute
+  '/_app/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
   '/_app/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/_public/studbook/$horseId': typeof PublicStudbookHorseIdRoute
+  '/_app/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
   '/_app/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/_app/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/_app/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/admin/registrations'
     | '/horses/$horseId'
     | '/studbook/$horseId'
+    | '/admin/registrations/$registrationId'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/admin/registrations'
     | '/horses/$horseId'
     | '/studbook/$horseId'
+    | '/admin/registrations/$registrationId'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -255,6 +267,7 @@ export interface FileRouteTypes {
     | '/_app/admin/registrations'
     | '/_app/horses/$horseId'
     | '/_public/studbook/$horseId'
+    | '/_app/admin/registrations/$registrationId'
     | '/_app/register/$registrationId/pay'
     | '/_app/register/$registrationId/status'
     | '/_app/transfer/$transferId/pay'
@@ -409,15 +422,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRegisterRegistrationIdPayRouteImport
       parentRoute: typeof AppRegisterRoute
     }
+    '/_app/admin/registrations/$registrationId': {
+      id: '/_app/admin/registrations/$registrationId'
+      path: '/$registrationId'
+      fullPath: '/admin/registrations/$registrationId'
+      preLoaderRoute: typeof AppAdminRegistrationsRegistrationIdRouteImport
+      parentRoute: typeof AppAdminRegistrationsRoute
+    }
   }
 }
 
+interface AppAdminRegistrationsRouteChildren {
+  AppAdminRegistrationsRegistrationIdRoute: typeof AppAdminRegistrationsRegistrationIdRoute
+}
+
+const AppAdminRegistrationsRouteChildren: AppAdminRegistrationsRouteChildren = {
+  AppAdminRegistrationsRegistrationIdRoute:
+    AppAdminRegistrationsRegistrationIdRoute,
+}
+
+const AppAdminRegistrationsRouteWithChildren =
+  AppAdminRegistrationsRoute._addFileChildren(
+    AppAdminRegistrationsRouteChildren,
+  )
+
 interface AppAdminRouteChildren {
-  AppAdminRegistrationsRoute: typeof AppAdminRegistrationsRoute
+  AppAdminRegistrationsRoute: typeof AppAdminRegistrationsRouteWithChildren
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
-  AppAdminRegistrationsRoute: AppAdminRegistrationsRoute,
+  AppAdminRegistrationsRoute: AppAdminRegistrationsRouteWithChildren,
 }
 
 const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
@@ -520,3 +554,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
