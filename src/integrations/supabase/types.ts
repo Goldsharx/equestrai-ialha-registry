@@ -392,35 +392,56 @@ export type Database = {
       }
       transfers: {
         Row: {
+          buyer_address: string | null
+          buyer_email: string | null
+          buyer_phone: string | null
           created_at: string
+          fee_amount: number | null
           from_owner_id: string | null
           from_owner_name: string | null
           horse_id: string
           id: string
+          is_gelded_at_transfer: boolean
           notes: string | null
-          to_owner_id: string
+          sale_date: string | null
+          status: string
+          to_owner_id: string | null
           to_owner_name: string | null
           transfer_date: string
         }
         Insert: {
+          buyer_address?: string | null
+          buyer_email?: string | null
+          buyer_phone?: string | null
           created_at?: string
+          fee_amount?: number | null
           from_owner_id?: string | null
           from_owner_name?: string | null
           horse_id: string
           id?: string
+          is_gelded_at_transfer?: boolean
           notes?: string | null
-          to_owner_id: string
+          sale_date?: string | null
+          status?: string
+          to_owner_id?: string | null
           to_owner_name?: string | null
           transfer_date?: string
         }
         Update: {
+          buyer_address?: string | null
+          buyer_email?: string | null
+          buyer_phone?: string | null
           created_at?: string
+          fee_amount?: number | null
           from_owner_id?: string | null
           from_owner_name?: string | null
           horse_id?: string
           id?: string
+          is_gelded_at_transfer?: boolean
           notes?: string | null
-          to_owner_id?: string
+          sale_date?: string | null
+          status?: string
+          to_owner_id?: string | null
           to_owner_name?: string | null
           transfer_date?: string
         }
