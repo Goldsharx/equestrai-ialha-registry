@@ -252,6 +252,7 @@ function RegisterWizardPage() {
           saving={saving}
           submitting={submitting}
           update={update}
+          registrationId={registrationId}
         />
       )}
 
