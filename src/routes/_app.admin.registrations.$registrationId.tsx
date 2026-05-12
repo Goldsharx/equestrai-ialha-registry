@@ -122,7 +122,7 @@ function AdminRegistrationDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checking, registrationId]);
 
-  const logActivity = async (action: string, metadata: Record<string, unknown> = {}) => {
+  const logActivity = async (action: string, metadata: Record<string, string> = {}) => {
     if (!user) return;
     const { data: prof } = await supabase.from("profiles").select("full_name").eq("user_id", user.id).maybeSingle();
     await supabase.from("activity_log").insert({
