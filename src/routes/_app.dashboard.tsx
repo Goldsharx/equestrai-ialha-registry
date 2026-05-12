@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -25,15 +26,6 @@ export const Route = createFileRoute("/_app/dashboard")({
   }),
   component: DashboardPage,
 });
-
-type RegistrationStatus =
-  | "draft"
-  | "pending_signatures"
-  | "pending_payment"
-  | "submitted"
-  | "in_review"
-  | "approved"
-  | "rejected";
 
 type StatusKey =
   | "draft"
