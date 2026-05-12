@@ -518,6 +518,7 @@ function StepParentage({
                 userId={userId}
                 value={data.foreign_document_path}
                 onChange={(path) => update({ foreign_document_path: path })}
+                onExtract={(fields) => update(fields)}
               />
             </div>
           </CardContent>
