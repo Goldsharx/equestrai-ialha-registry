@@ -1100,6 +1100,7 @@ function StepReview({
               </tr>
             </tbody>
           </table>
+          )}
         </CardContent>
       </Card>
 
