@@ -240,7 +240,8 @@ function RegisterWizardPage() {
   const goBack = () => setStep((s) => Math.max(1, s - 1));
 
   const handleSaveDraft = async () => {
-    const id = await persist(data, { saveMarkings: true });
+    console.log("[save-draft] click", { userId: user?.id, registrationId });
+    const id = await persist(data, { saveMarkings: true, status: "draft" });
     if (id) {
       toast.success("Draft saved");
       navigate({ to: "/dashboard" });
@@ -248,17 +249,15 @@ function RegisterWizardPage() {
   };
 
   const handleSubmitAndPay = async () => {
+    console.log("[submit-and-pay] click", { userId: user?.id, terms: data.terms_accepted });
     if (!data.terms_accepted) {
       toast.error("Please accept the terms to continue");
       return;
     }
     setSubmitting(true);
     try {
-      console.log("[submit-and-pay] saving draft…");
-      const id = await persist(data, { saveMarkings: true });
-      if (!id) throw new Error("Failed to save registration draft");
-      console.log("[submit-and-pay] draft saved", id);
-
+      const id = await persist(data, { saveMarkings: true, status: "pending_payment" });
+      if (!id) throw new Error("Failed to save registration");
       const returnUrl = `${window.location.origin}/register/${id}/status`;
       console.log("[submit-and-pay] invoking create-stripe-checkout", { id, returnUrl });
       const { data: stripeData, error: stripeError } = await supabase.functions.invoke(
@@ -267,10 +266,8 @@ function RegisterWizardPage() {
       );
       if (stripeError) throw stripeError;
       console.log("[submit-and-pay] stripe response", stripeData);
-
       const checkoutUrl = (stripeData as { checkout_url?: string } | null)?.checkout_url;
       if (!checkoutUrl) throw new Error("No checkout URL returned from payment service");
-
       window.location.href = checkoutUrl;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
