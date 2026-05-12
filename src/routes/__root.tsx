@@ -89,6 +89,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "EquestRai — IALHA Equestrian Registry" },
+      { name: "description", content: "EquestRai is an equestrian registry application for the IALHA, managing horse registrations and ownership." },
+      { property: "og:description", content: "EquestRai is an equestrian registry application for the IALHA, managing horse registrations and ownership." },
+      { name: "twitter:description", content: "EquestRai is an equestrian registry application for the IALHA, managing horse registrations and ownership." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d897d692-47e0-4e9d-86d7-c1e9cd0f25db/id-preview-f077c583--65f8ad26-ac09-4361-a38b-ea9b847e5ff6.lovable.app-1778611774583.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d897d692-47e0-4e9d-86d7-c1e9cd0f25db/id-preview-f077c583--65f8ad26-ac09-4361-a38b-ea9b847e5ff6.lovable.app-1778611774583.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
