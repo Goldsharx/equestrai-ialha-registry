@@ -396,10 +396,13 @@ function StepDetails({
               <Button
                 id="dob"
                 variant="outline"
-                className={cn("justify-start text-left font-normal", !data.birth_date && "text-muted-foreground")}
+                className={cn(
+                  "h-10 w-full justify-between text-left font-normal",
+                  !data.birth_date && "text-muted-foreground",
+                )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {data.birth_date ? format(data.birth_date, "PPP") : "Pick a date"}
+                <span>{data.birth_date ? format(data.birth_date, "PPP") : "Pick a date"}</span>
+                <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
