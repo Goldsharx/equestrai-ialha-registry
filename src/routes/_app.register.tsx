@@ -1052,6 +1052,7 @@ function StepReview({
   saving,
   submitting,
   update,
+  registrationId,
 }: {
   data: WizardData;
   onSaveDraft: () => void;
@@ -1059,7 +1060,21 @@ function StepReview({
   saving: boolean;
   submitting: boolean;
   update: (p: Partial<WizardData>) => void;
+  registrationId: string | null;
 }) {
+  const { data: markingsPhoto } = useQuery({
+    queryKey: ["markings-photo", registrationId],
+    enabled: !!registrationId && !data.no_markings,
+    queryFn: async () => {
+      const { data: rows } = await supabase
+        .from("horse_photos")
+        .select("url")
+        .eq("registration_id", registrationId!)
+        .eq("photo_type", "markings")
+        .maybeSingle();
+      return rows;
+    },
+  });
   const { data: feeResp, isLoading: feeLoading } = useQuery({
     queryKey: ["calculate-fees", data.type, data.birth_date?.toISOString() ?? null, data.add_ons.join(",")],
     enabled: !!data.type,
