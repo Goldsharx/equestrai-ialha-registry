@@ -9,12 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
 import { Route as PublicStudbookRouteImport } from './routes/_public.studbook'
-import { Route as PublicSignupRouteImport } from './routes/_public.signup'
-import { Route as PublicLoginRouteImport } from './routes/_public.login'
 import { Route as AppTransferRouteImport } from './routes/_app.transfer'
 import { Route as AppRegisterRouteImport } from './routes/_app.register'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -24,6 +24,16 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppChatRouteImport } from './routes/_app.chat'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
@@ -40,16 +50,6 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
 const PublicStudbookRoute = PublicStudbookRouteImport.update({
   id: '/studbook',
   path: '/studbook',
-  getParentRoute: () => PublicRoute,
-} as any)
-const PublicSignupRoute = PublicSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => PublicRoute,
-} as any)
-const PublicLoginRoute = PublicLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => PublicRoute,
 } as any)
 const AppTransferRoute = AppTransferRouteImport.update({
@@ -95,6 +95,8 @@ const AppAdminRoute = AppAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/admin': typeof AppAdminRoute
   '/chat': typeof AppChatRoute
   '/dashboard': typeof AppDashboardRoute
@@ -103,12 +105,12 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/register': typeof AppRegisterRoute
   '/transfer': typeof AppTransferRoute
-  '/login': typeof PublicLoginRoute
-  '/signup': typeof PublicSignupRoute
   '/studbook': typeof PublicStudbookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/admin': typeof AppAdminRoute
   '/chat': typeof AppChatRoute
   '/dashboard': typeof AppDashboardRoute
@@ -117,14 +119,14 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/register': typeof AppRegisterRoute
   '/transfer': typeof AppTransferRoute
-  '/login': typeof PublicLoginRoute
-  '/signup': typeof PublicSignupRoute
   '/studbook': typeof PublicStudbookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/_app/admin': typeof AppAdminRoute
   '/_app/chat': typeof AppChatRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -133,8 +135,6 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/register': typeof AppRegisterRoute
   '/_app/transfer': typeof AppTransferRoute
-  '/_public/login': typeof PublicLoginRoute
-  '/_public/signup': typeof PublicSignupRoute
   '/_public/studbook': typeof PublicStudbookRoute
   '/_public/': typeof PublicIndexRoute
 }
@@ -142,6 +142,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/signup'
     | '/admin'
     | '/chat'
     | '/dashboard'
@@ -150,12 +152,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/transfer'
-    | '/login'
-    | '/signup'
     | '/studbook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
+    | '/signup'
     | '/admin'
     | '/chat'
     | '/dashboard'
@@ -164,13 +166,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/transfer'
-    | '/login'
-    | '/signup'
     | '/studbook'
   id:
     | '__root__'
     | '/_app'
     | '/_public'
+    | '/login'
+    | '/signup'
     | '/_app/admin'
     | '/_app/chat'
     | '/_app/dashboard'
@@ -179,8 +181,6 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/register'
     | '/_app/transfer'
-    | '/_public/login'
-    | '/_public/signup'
     | '/_public/studbook'
     | '/_public/'
   fileRoutesById: FileRoutesById
@@ -188,10 +188,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_public': {
       id: '/_public'
       path: ''
@@ -218,20 +234,6 @@ declare module '@tanstack/react-router' {
       path: '/studbook'
       fullPath: '/studbook'
       preLoaderRoute: typeof PublicStudbookRouteImport
-      parentRoute: typeof PublicRoute
-    }
-    '/_public/signup': {
-      id: '/_public/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof PublicSignupRouteImport
-      parentRoute: typeof PublicRoute
-    }
-    '/_public/login': {
-      id: '/_public/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof PublicLoginRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_app/transfer': {
@@ -318,15 +320,11 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface PublicRouteChildren {
-  PublicLoginRoute: typeof PublicLoginRoute
-  PublicSignupRoute: typeof PublicSignupRoute
   PublicStudbookRoute: typeof PublicStudbookRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
-  PublicLoginRoute: PublicLoginRoute,
-  PublicSignupRoute: PublicSignupRoute,
   PublicStudbookRoute: PublicStudbookRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
@@ -337,6 +335,8 @@ const PublicRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
