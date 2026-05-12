@@ -198,7 +198,10 @@ function RegisterWizardPage() {
 
   const handleSaveDraft = async () => {
     const id = await persist(data);
-    if (id) toast.success("Draft saved");
+    if (id) {
+      toast.success("Draft saved");
+      navigate({ to: "/dashboard" });
+    }
   };
 
   const handleSubmitAndPay = async () => {
