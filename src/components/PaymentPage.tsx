@@ -73,25 +73,16 @@ export function PaymentPage({ kind, recordId, statusPath }: Props) {
   const handlePay = async () => {
     setPaying(true);
     try {
-      // TODO: replace with edge function call
-      // await supabase.functions.invoke('create-stripe-checkout', {
-      //   body: { [`${kind}_id`]: recordId, return_url: `${window.location.origin}${window.location.pathname}?success=true` }
-      // })
-      await new Promise((r) => setTimeout(r, 600));
-      const { error } = await supabase
-        .from(table)
-        .update({ payment_status: "paid" })
-        .eq("id", recordId);
+      const return_url = `${window.location.origin}${window.location.pathname}?success=true`;
+      const body: Record<string, unknown> = { return_url };
+      body[`${kind}_id`] = recordId;
+      const { data, error } = await supabase.functions.invoke("create-stripe-checkout", { body });
       if (error) throw error;
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-      toast.success("Payment successful! (mocked)");
-      await refetch();
-      if (statusPath) {
-        navigate({ to: statusPath, params: { registrationId: recordId } });
-      }
+      const checkoutUrl = (data as { checkout_url?: string })?.checkout_url;
+      if (!checkoutUrl) throw new Error("No checkout_url returned");
+      window.location.href = checkoutUrl;
     } catch (err: any) {
       toast.error(err.message ?? "Payment failed");
-    } finally {
       setPaying(false);
     }
   };
