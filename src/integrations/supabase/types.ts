@@ -271,9 +271,13 @@ export type Database = {
           address_line2: string | null
           city: string | null
           created_at: string
+          email: string | null
           farm_name: string | null
           full_name: string | null
+          ialha_member_id: string | null
           id: string
+          membership_expires: string | null
+          membership_type: string | null
           phone: string | null
           preferred_language: string
           state: string | null
@@ -286,9 +290,13 @@ export type Database = {
           address_line2?: string | null
           city?: string | null
           created_at?: string
+          email?: string | null
           farm_name?: string | null
           full_name?: string | null
+          ialha_member_id?: string | null
           id?: string
+          membership_expires?: string | null
+          membership_type?: string | null
           phone?: string | null
           preferred_language?: string
           state?: string | null
@@ -301,9 +309,13 @@ export type Database = {
           address_line2?: string | null
           city?: string | null
           created_at?: string
+          email?: string | null
           farm_name?: string | null
           full_name?: string | null
+          ialha_member_id?: string | null
           id?: string
+          membership_expires?: string | null
+          membership_type?: string | null
           phone?: string | null
           preferred_language?: string
           state?: string | null
