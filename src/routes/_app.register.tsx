@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MarkingsCanvas } from "@/components/MarkingsCanvas";
 
 export const Route = createFileRoute("/_app/register")({
   head: () => ({
@@ -251,6 +252,7 @@ function RegisterWizardPage() {
           saving={saving}
           submitting={submitting}
           update={update}
+          registrationId={registrationId}
         />
       )}
 
@@ -887,7 +889,7 @@ function StepPhotosMarkings({
         .single();
       if (insErr) throw insErr;
       setPhotos((prev) => [...prev.filter((p) => p.photo_type !== slot), row as PhotoRow]);
-      toast.success("Photo uploaded");
+      if (slot !== "markings") toast.success("Photo uploaded");
     } catch (err) {
       console.error(err);
       toast.error("Upload failed");
@@ -944,14 +946,15 @@ function StepPhotosMarkings({
 
           {!data.no_markings && (
             <>
-              <div className="flex h-48 items-center justify-center rounded-md border-2 border-dashed border-secondary/40 bg-cream/50 text-sm text-muted-foreground">
-                <div className="text-center">
-                  <p className="font-serif text-lg text-primary">Digital Markings Canvas</p>
-                  <p className="text-xs">Draw your horse's markings here</p>
-                </div>
-              </div>
+              <MarkingsCanvas
+                initialUrl={photos.find((p) => p.photo_type === "markings")?.url}
+                onSave={async (blob) => {
+                  const file = new File([blob], "markings.png", { type: "image/png" });
+                  await handleUpload("markings", file);
+                }}
+              />
               <Textarea
-                placeholder="Describe markings (e.g., star on forehead, white left hind sock)…"
+                placeholder="Or describe markings (e.g., star on forehead, white left hind sock)…"
                 value={data.markings_description}
                 maxLength={1000}
                 onChange={(e) => update({ markings_description: e.target.value })}
@@ -1049,6 +1052,7 @@ function StepReview({
   saving,
   submitting,
   update,
+  registrationId,
 }: {
   data: WizardData;
   onSaveDraft: () => void;
@@ -1056,7 +1060,21 @@ function StepReview({
   saving: boolean;
   submitting: boolean;
   update: (p: Partial<WizardData>) => void;
+  registrationId: string | null;
 }) {
+  const { data: markingsPhoto } = useQuery({
+    queryKey: ["markings-photo", registrationId],
+    enabled: !!registrationId && !data.no_markings,
+    queryFn: async () => {
+      const { data: rows } = await supabase
+        .from("horse_photos")
+        .select("url")
+        .eq("registration_id", registrationId!)
+        .eq("photo_type", "markings")
+        .maybeSingle();
+      return rows;
+    },
+  });
   const { data: feeResp, isLoading: feeLoading } = useQuery({
     queryKey: ["calculate-fees", data.type, data.birth_date?.toISOString() ?? null, data.add_ons.join(",")],
     enabled: !!data.type,
@@ -1120,6 +1138,15 @@ function StepReview({
               label="Markings"
               value={data.no_markings ? "None" : (data.markings_description || "—")}
             />
+            {!data.no_markings && markingsPhoto?.url && (
+              <div className="md:col-span-2 mt-2">
+                <img
+                  src={markingsPhoto.url}
+                  alt="Markings drawing"
+                  className="max-h-64 w-full rounded-md border bg-cream/30 object-contain"
+                />
+              </div>
+            )}
           </Section>
         </CardContent>
       </Card>
