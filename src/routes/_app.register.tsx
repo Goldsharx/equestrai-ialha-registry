@@ -207,9 +207,31 @@ function RegisterWizardPage() {
       return;
     }
     setSubmitting(true);
-    const id = await persist(data);
-    setSubmitting(false);
-    if (id) navigate({ to: "/register/$registrationId/pay", params: { registrationId: id } });
+    try {
+      console.log("[submit-and-pay] saving draft…");
+      const id = await persist(data);
+      if (!id) throw new Error("Failed to save registration draft");
+      console.log("[submit-and-pay] draft saved", id);
+
+      const returnUrl = `${window.location.origin}/register/${id}/status`;
+      console.log("[submit-and-pay] invoking create-stripe-checkout", { id, returnUrl });
+      const { data: stripeData, error: stripeError } = await supabase.functions.invoke(
+        "create-stripe-checkout",
+        { body: { registration_id: id, return_url: returnUrl } },
+      );
+      if (stripeError) throw stripeError;
+      console.log("[submit-and-pay] stripe response", stripeData);
+
+      const checkoutUrl = (stripeData as { checkout_url?: string } | null)?.checkout_url;
+      if (!checkoutUrl) throw new Error("No checkout URL returned from payment service");
+
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[submit-and-pay] error", err);
+      toast.error(`Couldn't start checkout: ${message}`);
+      setSubmitting(false);
+    }
   };
 
   return (
