@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Info, CheckCircle2, AlertTriangle, Bell } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 type Notification = {
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/_app/notifications")({
 
 function NotificationsPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [items, setItems] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
@@ -65,7 +67,7 @@ function NotificationsPage() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       if (!active) return;
-      if (error) toast.error("Failed to load notifications");
+      if (error) toast.error(t("notif.loadFailed"));
       else setItems((data ?? []) as Notification[]);
       setLoading(false);
     })();
@@ -119,39 +121,39 @@ function NotificationsPage() {
       .update({ read: true })
       .eq("user_id", user.id)
       .eq("read", false);
-    if (error) toast.error("Failed to mark all read");
-    else toast.success("All notifications marked as read");
+    if (error) toast.error(t("err.tryAgain"));
+    else toast.success(t("notif.markAllSuccess"));
   };
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-3xl font-bold">Notifications</h1>
+          <h1 className="font-heading text-3xl font-bold">{t("notif.title")}</h1>
           <p className="text-sm text-muted-foreground">
-            {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
+            {unreadCount > 0 ? t("notif.unreadCount", { n: unreadCount }) : t("notif.allCaughtUp")}
           </p>
         </div>
         <Button variant="outline" onClick={markAllRead} disabled={unreadCount === 0}>
-          Mark All Read
+          {t("btn.markAllRead")}
         </Button>
       </div>
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
         <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="registrations">Registrations</TabsTrigger>
-          <TabsTrigger value="transfers">Transfers</TabsTrigger>
-          <TabsTrigger value="system">System</TabsTrigger>
+          <TabsTrigger value="all">{t("notif.tabAll")}</TabsTrigger>
+          <TabsTrigger value="registrations">{t("notif.tabRegistrations")}</TabsTrigger>
+          <TabsTrigger value="transfers">{t("notif.tabTransfers")}</TabsTrigger>
+          <TabsTrigger value="system">{t("notif.tabSystem")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={filter} className="mt-4 space-y-3">
           {loading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
           ) : filtered.length === 0 ? (
             <Card className="flex flex-col items-center gap-2 p-10 text-center text-muted-foreground">
               <Bell className="h-8 w-8 opacity-40" />
-              <p className="text-sm">No notifications</p>
+              <p className="text-sm">{t("notif.empty")}</p>
             </Card>
           ) : (
             filtered.map((n) => {

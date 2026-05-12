@@ -21,21 +21,24 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+import { useLanguage } from "@/contexts/LanguageContext";
+
 const main = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "My Horses", url: "/horses", icon: Rabbit },
-  { title: "Register", url: "/register", icon: FilePlus },
-  { title: "Transfer", url: "/transfer", icon: ArrowLeftRight },
-  { title: "Notifications", url: "/notifications", icon: Bell },
-  { title: "Chat", url: "/chat", icon: MessageSquare },
-  { title: "Profile", url: "/profile", icon: User },
+  { titleKey: "nav.dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { titleKey: "nav.myHorses", url: "/horses", icon: Rabbit },
+  { titleKey: "nav.register", url: "/register", icon: FilePlus },
+  { titleKey: "nav.transfer", url: "/transfer", icon: ArrowLeftRight },
+  { titleKey: "nav.notifications", url: "/notifications", icon: Bell },
+  { titleKey: "nav.chat", url: "/chat", icon: MessageSquare },
+  { titleKey: "nav.profile", url: "/profile", icon: User },
 ] as const;
 
-const adminItems = [{ title: "Admin", url: "/admin", icon: Shield }] as const;
+const adminItems = [{ titleKey: "nav.admin", url: "/admin", icon: Shield }] as const;
 
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (p: string) => currentPath === p;
+  const { t } = useLanguage();
 
   return (
     <Sidebar collapsible="icon">
@@ -51,37 +54,43 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Registry</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav.registry")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {main.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {main.map((item) => {
+                const label = t(item.titleKey);
+                return (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={label}>
+                      <Link to={item.url} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Administration</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav.administration")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {adminItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {adminItems.map((item) => {
+                const label = t(item.titleKey);
+                return (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={label}>
+                      <Link to={item.url} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

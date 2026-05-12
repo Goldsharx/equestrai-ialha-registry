@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Notification = {
   id: string;
@@ -20,6 +21,7 @@ type Notification = {
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [unread, setUnread] = useState(0);
   const [recent, setRecent] = useState<Notification[]>([]);
 
@@ -77,7 +79,7 @@ export function NotificationBell() {
         <button
           type="button"
           className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
-          aria-label="Notifications"
+          aria-label={t("nav.notifications")}
         >
           <Bell className="h-5 w-5" />
           {unread > 0 && (
@@ -89,12 +91,12 @@ export function NotificationBell() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 p-0">
         <div className="flex items-center justify-between border-b px-3 py-2">
-          <span className="text-sm font-semibold">Notifications</span>
-          {unread > 0 && <span className="text-xs text-muted-foreground">{unread} unread</span>}
+          <span className="text-sm font-semibold">{t("notif.title")}</span>
+          {unread > 0 && <span className="text-xs text-muted-foreground">{t("notif.unreadCount", { n: unread })}</span>}
         </div>
         <div className="max-h-80 overflow-auto">
           {recent.length === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-muted-foreground">No notifications</p>
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground">{t("notif.empty")}</p>
           ) : (
             recent.map((n) => (
               <Link
@@ -123,7 +125,7 @@ export function NotificationBell() {
           to="/notifications"
           className="block border-t px-3 py-2 text-center text-sm font-medium text-primary hover:bg-muted/50"
         >
-          View All
+          {t("common.viewAll")}
         </Link>
       </DropdownMenuContent>
     </DropdownMenu>

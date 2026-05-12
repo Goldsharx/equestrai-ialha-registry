@@ -1,18 +1,35 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/studbook", label: "Studbook" },
-];
+function HeaderLanguageToggle() {
+  const { lang, setLang } = useLanguage();
+  return (
+    <button
+      type="button"
+      onClick={() => setLang(lang === "en" ? "es" : "en")}
+      className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold text-primary-foreground/90 transition-colors hover:bg-white/10 hover:text-accent"
+      aria-label="Toggle language"
+    >
+      <Languages className="h-3.5 w-3.5" />
+      {lang === "en" ? "ES" : "EN"}
+    </button>
+  );
+}
 
 export function SiteHeader(_props: { unreadCount?: number } = {}) {
   const [open, setOpen] = useState(false);
   const { session } = useAuth();
+  const { t } = useLanguage();
+
+  const navLinks = [
+    { to: "/", label: t("nav.home") },
+    { to: "/studbook", label: t("nav.studbook") },
+  ];
 
   return (
     <header className="sticky top-0 z-40 w-full bg-primary text-primary-foreground shadow-sm">
@@ -44,14 +61,15 @@ export function SiteHeader(_props: { unreadCount?: number } = {}) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <HeaderLanguageToggle />
           {session && <NotificationBell />}
 
           <div className="hidden md:flex md:items-center md:gap-2">
             <Button asChild variant="ghost" className="text-primary-foreground hover:bg-white/10 hover:text-accent">
-              <Link to="/login">Login</Link>
+              <Link to="/login">{t("nav.login")}</Link>
             </Button>
             <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/signup">Sign Up</Link>
+              <Link to="/signup">{t("nav.signup")}</Link>
             </Button>
           </div>
 
@@ -86,14 +104,14 @@ export function SiteHeader(_props: { unreadCount?: number } = {}) {
               onClick={() => setOpen(false)}
               className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
             >
-              Login
+              {t("nav.login")}
             </Link>
             <Link
               to="/signup"
               onClick={() => setOpen(false)}
               className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground"
             >
-              Sign Up
+              {t("nav.signup")}
             </Link>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 type Profile = {
@@ -53,6 +54,7 @@ export const Route = createFileRoute("/_app/profile")({
 
 function ProfilePage() {
   const { user } = useAuth();
+  const { t, setLang } = useLanguage();
   const [profile, setProfile] = useState<Profile>(empty);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -93,17 +95,17 @@ function ProfilePage() {
       })
       .eq("user_id", user.id);
     setSaving(false);
-    if (error) toast.error("Failed to save: " + error.message);
-    else toast.success("Profile saved");
+    if (error) toast.error(t("err.tryAgain"));
+    else toast.success(t("profile.saveSuccess"));
   };
 
   const handleChangePassword = async () => {
-    if (!profile.email) return toast.error("Missing email");
+    if (!profile.email) return toast.error(t("auth.email"));
     const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) toast.error(error.message);
-    else toast.success("Password reset email sent");
+    else toast.success(t("profile.resetEmailSent"));
   };
 
   const handleManagePayments = async () => {
@@ -111,42 +113,46 @@ function ProfilePage() {
       body: { return_url: window.location.origin + "/profile" },
     });
     if (error || !data?.url) {
-      toast.error("Payment portal is not available yet.");
+      toast.error(t("profile.portalUnavailable"));
       return;
     }
     window.location.href = data.url as string;
   };
 
-  if (loading) return <p className="text-sm text-muted-foreground">Loading...</p>;
+  if (loading) return <p className="text-sm text-muted-foreground">{t("common.loading")}</p>;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="font-heading text-3xl font-bold">Profile</h1>
-        <p className="text-sm text-muted-foreground">Manage your contact info and account settings.</p>
+        <h1 className="font-heading text-3xl font-bold">{t("profile.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("profile.subtitle")}</p>
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Personal Info</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t("profile.personalInfo")}</CardTitle></CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="full_name">Full Name</Label>
+            <Label htmlFor="full_name">{t("auth.fullName")}</Label>
             <Input id="full_name" value={profile.full_name ?? ""} onChange={(e) => update("full_name", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.email")}</Label>
             <Input id="email" value={profile.email ?? ""} readOnly className="bg-muted" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">{t("auth.phone")}</Label>
             <Input id="phone" value={profile.phone ?? ""} onChange={(e) => update("phone", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label>Preferred Language</Label>
+            <Label>{t("auth.preferredLanguage")}</Label>
             <ToggleGroup
               type="single"
               value={profile.preferred_language}
-              onValueChange={(v) => v && update("preferred_language", v)}
+              onValueChange={(v) => {
+                if (!v) return;
+                update("preferred_language", v);
+                if (v === "en" || v === "es") setLang(v);
+              }}
               className="justify-start"
             >
               <ToggleGroupItem value="en">EN</ToggleGroupItem>
@@ -157,71 +163,73 @@ function ProfilePage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Farm Info</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t("profile.farmInfo")}</CardTitle></CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="farm_name">Farm Name</Label>
+            <Label htmlFor="farm_name">{t("auth.farmName")}</Label>
             <Input id="farm_name" value={profile.farm_name ?? ""} onChange={(e) => update("farm_name", e.target.value)} />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="address_line1">Address Line 1</Label>
+            <Label htmlFor="address_line1">{t("auth.addressLine1")}</Label>
             <Input id="address_line1" value={profile.address_line1 ?? ""} onChange={(e) => update("address_line1", e.target.value)} />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="address_line2">Address Line 2</Label>
+            <Label htmlFor="address_line2">{t("auth.addressLine2")}</Label>
             <Input id="address_line2" value={profile.address_line2 ?? ""} onChange={(e) => update("address_line2", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
+            <Label htmlFor="city">{t("auth.city")}</Label>
             <Input id="city" value={profile.city ?? ""} onChange={(e) => update("city", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="state">State</Label>
+            <Label htmlFor="state">{t("auth.state")}</Label>
             <Input id="state" value={profile.state ?? ""} onChange={(e) => update("state", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="zip">ZIP</Label>
+            <Label htmlFor="zip">{t("auth.zip")}</Label>
             <Input id="zip" value={profile.zip ?? ""} onChange={(e) => update("zip", e.target.value)} />
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Membership</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t("profile.membership")}</CardTitle></CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
-            <Label>Membership Type</Label>
+            <Label>{t("profile.membershipType")}</Label>
             <Input value={profile.membership_type ?? "—"} readOnly className="bg-muted" />
           </div>
           <div className="space-y-2">
-            <Label>Member ID</Label>
+            <Label>{t("profile.memberId")}</Label>
             <Input value={profile.ialha_member_id ?? "—"} readOnly className="bg-muted" />
           </div>
           <div className="space-y-2">
-            <Label>Expires</Label>
+            <Label>{t("profile.expires")}</Label>
             <Input value={profile.membership_expires ?? "—"} readOnly className="bg-muted" />
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Security</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t("profile.security")}</CardTitle></CardHeader>
         <CardContent>
-          <Button variant="outline" onClick={handleChangePassword}>Change Password</Button>
-          <p className="mt-2 text-xs text-muted-foreground">We'll email a secure reset link to {profile.email}.</p>
+          <Button variant="outline" onClick={handleChangePassword}>{t("btn.changePassword")}</Button>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t("profile.passwordHint", { email: profile.email ?? "" })}
+          </p>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Payment</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t("profile.payment")}</CardTitle></CardHeader>
         <CardContent>
-          <Button variant="outline" onClick={handleManagePayments}>Manage Payment Methods</Button>
+          <Button variant="outline" onClick={handleManagePayments}>{t("btn.managePayments")}</Button>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? "Saving..." : "Save Changes"}
+          {saving ? t("common.saving") : t("common.saveChanges")}
         </Button>
       </div>
     </div>

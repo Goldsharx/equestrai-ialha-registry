@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -26,23 +27,27 @@ export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
 });
 
-type RegistrationStatus =
+type StatusKey =
   | "draft"
   | "pending_signatures"
   | "pending_payment"
   | "submitted"
   | "in_review"
   | "approved"
-  | "rejected";
+  | "rejected"
+  | "needs_info"
+  | "pending_board";
 
-const statusStyles: Record<RegistrationStatus, { label: string; className: string }> = {
-  draft: { label: "Draft", className: "bg-muted text-muted-foreground border-border" },
-  pending_signatures: { label: "Pending Signatures", className: "bg-yellow-100 text-yellow-900 border-yellow-300" },
-  pending_payment: { label: "Pending Payment", className: "bg-orange-100 text-orange-900 border-orange-300" },
-  submitted: { label: "Submitted", className: "bg-blue-100 text-blue-900 border-blue-300" },
-  in_review: { label: "In Review", className: "bg-purple-100 text-purple-900 border-purple-300" },
-  approved: { label: "Approved", className: "bg-green-100 text-green-900 border-green-300" },
-  rejected: { label: "Rejected", className: "bg-destructive/10 text-destructive border-destructive/30" },
+const statusClasses: Record<StatusKey, string> = {
+  draft: "bg-muted text-muted-foreground border-border",
+  pending_signatures: "bg-yellow-100 text-yellow-900 border-yellow-300",
+  pending_payment: "bg-orange-100 text-orange-900 border-orange-300",
+  submitted: "bg-blue-100 text-blue-900 border-blue-300",
+  in_review: "bg-purple-100 text-purple-900 border-purple-300",
+  approved: "bg-green-100 text-green-900 border-green-300",
+  rejected: "bg-destructive/10 text-destructive border-destructive/30",
+  needs_info: "bg-amber-100 text-amber-900 border-amber-300",
+  pending_board: "bg-indigo-100 text-indigo-900 border-indigo-300",
 };
 
 function DashboardPage() {
@@ -115,12 +120,15 @@ function DashboardPage() {
     };
   }, [userId, queryClient]);
 
+  const { t } = useLanguage();
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
-        <h1 className="font-heading text-3xl text-primary">Dashboard</h1>
+        <h1 className="font-heading text-3xl text-primary">{t("dashboard.title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""}.
+          {t("dashboard.welcomeBack")}
+          {user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""}.
         </p>
       </header>
 
@@ -128,12 +136,12 @@ function DashboardPage() {
         {/* My Horses */}
         <DashboardCard
           icon={Rabbit}
-          title="My Horses"
+          title={t("dashboard.myHorses")}
           count={horsesQuery.data?.count}
           loading={horsesQuery.isLoading}
           footer={
             <Link to="/horses" className="inline-flex items-center text-sm font-semibold text-primary hover:text-accent-foreground">
-              View all <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              {t("common.viewAll")} <ArrowRight className="ml-1 h-3.5 w-3.5" />
             </Link>
           }
         >
@@ -152,26 +160,27 @@ function DashboardPage() {
               ))}
             </ul>
           ) : (
-            <EmptyState text="No horses registered yet." />
+            <EmptyState text={t("dashboard.noHorses")} />
           )}
         </DashboardCard>
 
         {/* Pending Applications */}
         <DashboardCard
           icon={FilePlus}
-          title="Pending Applications"
+          title={t("dashboard.pendingApplications")}
           count={registrationsQuery.data?.count}
           loading={registrationsQuery.isLoading}
           footer={
             <Link to="/register" className="inline-flex items-center text-sm font-semibold text-primary hover:text-accent-foreground">
-              Start a new registration <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              {t("dashboard.startNewRegistration")} <ArrowRight className="ml-1 h-3.5 w-3.5" />
             </Link>
           }
         >
           {registrationsQuery.data?.items.length ? (
             <ul className="divide-y">
               {registrationsQuery.data.items.map((r) => {
-                const style = statusStyles[r.status as RegistrationStatus];
+                const key = (r.status as StatusKey) ?? "draft";
+                const cls = statusClasses[key] ?? statusClasses.draft;
                 return (
                   <li key={r.id}>
                     <Link
@@ -179,10 +188,10 @@ function DashboardPage() {
                       className="flex items-center justify-between gap-3 py-2.5 text-sm hover:text-accent-foreground"
                     >
                       <span className="truncate font-medium">
-                        {r.horse_name ?? "Untitled application"}
+                        {r.horse_name ?? t("dashboard.untitledApplication")}
                       </span>
-                      <Badge variant="outline" className={cn("shrink-0 border", style.className)}>
-                        {style.label}
+                      <Badge variant="outline" className={cn("shrink-0 border", cls)}>
+                        {t(`status.${key}`)}
                       </Badge>
                     </Link>
                   </li>
@@ -190,18 +199,18 @@ function DashboardPage() {
               })}
             </ul>
           ) : (
-            <EmptyState text="No pending applications." />
+            <EmptyState text={t("dashboard.noPending")} />
           )}
         </DashboardCard>
 
         {/* Recent Notifications */}
         <DashboardCard
           icon={Bell}
-          title="Recent Notifications"
+          title={t("dashboard.recentNotifications")}
           loading={notificationsQuery.isLoading}
           footer={
             <Link to="/notifications" className="inline-flex items-center text-sm font-semibold text-primary hover:text-accent-foreground">
-              View all <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              {t("common.viewAll")} <ArrowRight className="ml-1 h-3.5 w-3.5" />
             </Link>
           }
         >
@@ -226,17 +235,17 @@ function DashboardPage() {
               ))}
             </ul>
           ) : (
-            <EmptyState text="You're all caught up." />
+            <EmptyState text={t("notif.allCaughtUp")} />
           )}
         </DashboardCard>
 
         {/* Quick Actions */}
-        <DashboardCard icon={ArrowRight} title="Quick Actions">
+        <DashboardCard icon={ArrowRight} title={t("dashboard.quickActions")}>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <QuickAction to="/register" icon={FilePlus} label="Register a Horse" primary />
-            <QuickAction to="/transfer" icon={ArrowLeftRight} label="Transfer Ownership" />
-            <QuickAction to="/studbook" icon={Search} label="Search Studbook" />
-            <QuickAction to="/chat" icon={MessageSquare} label="AI Chat" />
+            <QuickAction to="/register" icon={FilePlus} label={t("dashboard.registerHorse")} primary />
+            <QuickAction to="/transfer" icon={ArrowLeftRight} label={t("dashboard.transferOwnership")} />
+            <QuickAction to="/studbook" icon={Search} label={t("dashboard.searchStudbook")} />
+            <QuickAction to="/chat" icon={MessageSquare} label={t("dashboard.aiChat")} />
           </div>
         </DashboardCard>
       </div>
