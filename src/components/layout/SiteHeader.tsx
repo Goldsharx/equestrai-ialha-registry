@@ -160,20 +160,43 @@ export function SiteHeader(_props: { unreadCount?: number } = {}) {
                 {l.label}
               </Link>
             ))}
-            <Link
-              to="/login"
-              onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
-            >
-              {t("nav.login")}
-            </Link>
-            <Link
-              to="/signup"
-              onClick={() => setOpen(false)}
-              className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground"
-            >
-              {t("nav.signup")}
-            </Link>
+            {session ? (
+              <>
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent">
+                  {t("nav.dashboard")}
+                </Link>
+                <Link to="/horses" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent">
+                  {t("nav.myHorses")}
+                </Link>
+                <Link to="/profile" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent">
+                  {t("nav.profile")}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => { setOpen(false); handleLogout(); }}
+                  className="rounded-md px-3 py-2 text-left text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
+                >
+                  {t("nav.logout")}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-accent"
+                >
+                  {t("nav.login")}
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground"
+                >
+                  {t("nav.signup")}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
