@@ -85,6 +85,7 @@ export type Database = {
         Row: {
           birth_country: string | null
           breed: string | null
+          breed_type: string | null
           certificate_url: string | null
           color: string | null
           created_at: string
@@ -108,6 +109,7 @@ export type Database = {
         Insert: {
           birth_country?: string | null
           breed?: string | null
+          breed_type?: string | null
           certificate_url?: string | null
           color?: string | null
           created_at?: string
@@ -131,6 +133,7 @@ export type Database = {
         Update: {
           birth_country?: string | null
           breed?: string | null
+          breed_type?: string | null
           certificate_url?: string | null
           color?: string | null
           created_at?: string
@@ -234,32 +237,92 @@ export type Database = {
       registrations: {
         Row: {
           applicant_id: string
+          birth_country: string | null
+          birth_date: string | null
+          breeder_contact: string | null
+          breeder_name: string | null
+          color: string | null
           created_at: string
+          dam_id: string | null
+          dam_name: string | null
+          dna_case_number: string | null
+          foreign_registration_number: string | null
+          foreign_registry_name: string | null
           horse_id: string | null
           horse_name: string | null
           id: string
+          microchip_number: string | null
+          name_choice_1: string | null
+          name_choice_2: string | null
+          name_choice_3: string | null
+          sex: string | null
+          sire_id: string | null
+          sire_name: string | null
+          stallion_owner_contact: string | null
+          stallion_owner_name: string | null
           status: Database["public"]["Enums"]["registration_status"]
           submitted_at: string | null
+          type: string | null
           updated_at: string
         }
         Insert: {
           applicant_id: string
+          birth_country?: string | null
+          birth_date?: string | null
+          breeder_contact?: string | null
+          breeder_name?: string | null
+          color?: string | null
           created_at?: string
+          dam_id?: string | null
+          dam_name?: string | null
+          dna_case_number?: string | null
+          foreign_registration_number?: string | null
+          foreign_registry_name?: string | null
           horse_id?: string | null
           horse_name?: string | null
           id?: string
+          microchip_number?: string | null
+          name_choice_1?: string | null
+          name_choice_2?: string | null
+          name_choice_3?: string | null
+          sex?: string | null
+          sire_id?: string | null
+          sire_name?: string | null
+          stallion_owner_contact?: string | null
+          stallion_owner_name?: string | null
           status?: Database["public"]["Enums"]["registration_status"]
           submitted_at?: string | null
+          type?: string | null
           updated_at?: string
         }
         Update: {
           applicant_id?: string
+          birth_country?: string | null
+          birth_date?: string | null
+          breeder_contact?: string | null
+          breeder_name?: string | null
+          color?: string | null
           created_at?: string
+          dam_id?: string | null
+          dam_name?: string | null
+          dna_case_number?: string | null
+          foreign_registration_number?: string | null
+          foreign_registry_name?: string | null
           horse_id?: string | null
           horse_name?: string | null
           id?: string
+          microchip_number?: string | null
+          name_choice_1?: string | null
+          name_choice_2?: string | null
+          name_choice_3?: string | null
+          sex?: string | null
+          sire_id?: string | null
+          sire_name?: string | null
+          stallion_owner_contact?: string | null
+          stallion_owner_name?: string | null
           status?: Database["public"]["Enums"]["registration_status"]
           submitted_at?: string | null
+          type?: string | null
           updated_at?: string
         }
         Relationships: [
