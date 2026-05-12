@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ClipboardList, Network, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 import heroImage from "@/assets/hero-andalusian.jpg";
 
 export const Route = createFileRoute("/_public/")({
@@ -25,35 +26,24 @@ export const Route = createFileRoute("/_public/")({
   component: HomePage,
 });
 
-const features = [
-  {
-    icon: ClipboardList,
-    title: "Digital Registration",
-    body: "Submit applications online. Track status in real-time. No more paper forms.",
-  },
-  {
-    icon: Network,
-    title: "Verified Pedigrees",
-    body: "4-generation pedigree charts verified against our studbook of 15,000+ horses.",
-  },
-  {
-    icon: Sparkles,
-    title: "AI-Powered",
-    body: "Intelligent document processing, automated screening, and instant member support.",
-  },
-];
-
-const stats = [
-  { value: "15,000+", label: "Registered Horses" },
-  { value: "4", label: "Breeds Served" },
-  { value: "1979", label: "Established" },
-  { value: "100%", label: "Digital" },
-];
-
 function HomePage() {
+  const { t } = useLanguage();
+
+  const features = [
+    { icon: ClipboardList, title: t("landing.feat1Title"), body: t("landing.feat1Body") },
+    { icon: Network, title: t("landing.feat2Title"), body: t("landing.feat2Body") },
+    { icon: Sparkles, title: t("landing.feat3Title"), body: t("landing.feat3Body") },
+  ];
+
+  const stats = [
+    { value: "15,000+", label: t("landing.statHorses") },
+    { value: "4", label: t("landing.statBreeds") },
+    { value: "1979", label: t("landing.statEstablished") },
+    { value: "100%", label: t("landing.statDigital") },
+  ];
+
   return (
     <>
-      {/* Hero */}
       <section className="relative isolate overflow-hidden">
         <img
           src={heroImage}
@@ -75,14 +65,13 @@ function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 py-28 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
           <div className="max-w-3xl text-primary-foreground">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
-              International Andalusian &amp; Lusitano Horse Association
+              {t("landing.eyebrow")}
             </p>
             <h1 className="mt-5 font-heading text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
-              Your Dream. <span className="text-accent">Our Purpose.</span>
+              {t("landing.heroLine1")} <span className="text-accent">{t("landing.heroLine2")}</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg text-primary-foreground/85 sm:text-xl">
-              The International Andalusian &amp; Lusitano Horse Association —
-              Preserving Excellence Since 1979.
+              {t("landing.heroSubtitle")}
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button
@@ -90,7 +79,7 @@ function HomePage() {
                 size="lg"
                 className="bg-accent text-accent-foreground shadow-lg shadow-black/20 hover:bg-accent/90"
               >
-                <Link to="/register">Register a Horse</Link>
+                <Link to="/register">{t("landing.ctaRegister")}</Link>
               </Button>
               <Button
                 asChild
@@ -98,7 +87,7 @@ function HomePage() {
                 variant="outline"
                 className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:border-accent hover:bg-white/10 hover:text-accent"
               >
-                <Link to="/studbook">Search Studbook</Link>
+                <Link to="/studbook">{t("landing.ctaStudbook")}</Link>
               </Button>
               <Button
                 asChild
@@ -106,23 +95,20 @@ function HomePage() {
                 variant="outline"
                 className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:border-accent hover:bg-white/10 hover:text-accent"
               >
-                <Link to="/signup">Become a Member</Link>
+                <Link to="/signup">{t("landing.ctaJoin")}</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
       <section className="bg-background py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-heading text-3xl text-primary sm:text-4xl">
-              A modern home for a timeless tradition
+              {t("landing.featuresHeading")}
             </h2>
-            <p className="mt-3 text-base text-muted-foreground">
-              Everything you need to register, manage, and celebrate your horses.
-            </p>
+            <p className="mt-3 text-base text-muted-foreground">{t("landing.featuresSub")}</p>
           </div>
 
           <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -142,7 +128,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="bg-primary text-primary-foreground">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <dl className="grid grid-cols-2 gap-y-10 text-center md:grid-cols-4">
@@ -159,15 +144,12 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="bg-background py-20 sm:py-24">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="font-heading text-3xl text-primary sm:text-4xl">
-            Ready to modernize your registry experience?
+            {t("landing.ctaHeading")}
           </h2>
-          <p className="mt-3 text-base text-muted-foreground">
-            Join breeders, owners, and IALHA members already on EquestRai.
-          </p>
+          <p className="mt-3 text-base text-muted-foreground">{t("landing.ctaSub")}</p>
           <div className="mt-8 flex justify-center">
             <Button
               asChild
@@ -175,7 +157,7 @@ function HomePage() {
               className="bg-accent text-accent-foreground shadow-lg shadow-primary/10 hover:bg-accent/90"
             >
               <Link to="/signup">
-                Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                {t("landing.ctaButton")} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
