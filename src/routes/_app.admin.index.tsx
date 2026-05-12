@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ClipboardCheck, PenLine, CreditCard, Gavel, DollarSign, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/_app/admin/")({
-  head: () => ({ meta: [{ title: "Staff Dashboard — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Staff Dashboard — Equestrai" }] }),
   component: AdminDashboard,
 });
 

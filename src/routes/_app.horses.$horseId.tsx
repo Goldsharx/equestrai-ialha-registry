@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/_app/horses/$horseId")({
   head: () => ({
-    meta: [{ title: "Horse Details — EquestRai" }],
+    meta: [{ title: "Horse Details — Equestrai" }],
   }),
   component: HorseDetailPage,
 });

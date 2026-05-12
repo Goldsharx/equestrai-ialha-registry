@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_app/register/$registrationId/status")({
-  head: () => ({ meta: [{ title: "Registration Status — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Registration Status — Equestrai" }] }),
   component: StatusPage,
 });
 

@@ -62,7 +62,7 @@ export function AppSidebar() {
             I
           </div>
           <span className="font-heading text-base font-semibold text-accent group-data-[collapsible=icon]:hidden">
-            EquestRai
+            Equestrai
           </span>
         </Link>
       </SidebarHeader>

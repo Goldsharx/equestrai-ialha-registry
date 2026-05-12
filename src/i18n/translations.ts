@@ -176,7 +176,7 @@ export const translations = {
     "landing.statEstablished": "Established",
     "landing.statDigital": "Digital",
     "landing.ctaHeading": "Ready to modernize your registry experience?",
-    "landing.ctaSub": "Join breeders, owners, and IALHA members already on EquestRai.",
+    "landing.ctaSub": "Join breeders, owners, and IALHA members already on Equestrai.",
     "landing.ctaButton": "Get Started",
   },
 
@@ -356,7 +356,7 @@ export const translations = {
     "landing.statDigital": "Digital",
     "landing.ctaHeading": "¿Listo para modernizar tu experiencia con el registro?",
     "landing.ctaSub":
-      "Únete a criadores, propietarios y miembros de IALHA que ya están en EquestRai.",
+      "Únete a criadores, propietarios y miembros de IALHA que ya están en Equestrai.",
     "landing.ctaButton": "Comenzar",
   },
 } as const;

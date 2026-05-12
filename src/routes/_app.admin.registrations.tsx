@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_app/admin/registrations")({
   validateSearch: (s: Record<string, unknown>) => ({
     status: typeof s.status === "string" ? s.status : "all",
   }),
-  head: () => ({ meta: [{ title: "Registrations Queue — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Registrations Queue — Equestrai" }] }),
   component: AdminRegistrations,
 });
 

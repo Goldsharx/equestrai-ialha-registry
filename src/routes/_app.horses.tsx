@@ -26,7 +26,7 @@ import {
 export const Route = createFileRoute("/_app/horses")({
   head: () => ({
     meta: [
-      { title: "My Horses — EquestRai" },
+      { title: "My Horses — Equestrai" },
       { name: "description", content: "Manage your registered horses." },
     ],
   }),

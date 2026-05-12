@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_app/admin/transfers")({
   validateSearch: (s: Record<string, unknown>) => ({
     status: typeof s.status === "string" ? s.status : "all",
   }),
-  head: () => ({ meta: [{ title: "Transfers Queue — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Transfers Queue — Equestrai" }] }),
   component: AdminTransfers,
 });
 

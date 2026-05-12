@@ -19,8 +19,8 @@ export const Route = createFileRoute("/login")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Login — EquestRai" },
-      { name: "description", content: "Log in to your IALHA EquestRai account." },
+      { title: "Login — Equestrai" },
+      { name: "description", content: "Log in to your IALHA Equestrai account." },
     ],
   }),
   component: LoginPage,
@@ -101,7 +101,7 @@ function LoginPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary font-heading text-lg font-bold text-accent">
             I
           </div>
-          <span className="font-heading text-xl font-semibold text-primary">EquestRai</span>
+          <span className="font-heading text-xl font-semibold text-primary">Equestrai</span>
         </Link>
 
         <h1 className="mt-6 text-center font-heading text-2xl text-primary">

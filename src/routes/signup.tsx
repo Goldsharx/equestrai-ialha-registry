@@ -21,8 +21,8 @@ import { Toaster } from "@/components/ui/sonner";
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Sign Up — EquestRai" },
-      { name: "description", content: "Create your IALHA EquestRai account." },
+      { title: "Sign Up — Equestrai" },
+      { name: "description", content: "Create your IALHA Equestrai account." },
     ],
   }),
   component: SignupPage,
@@ -95,7 +95,7 @@ function SignupPage() {
     }
     // Welcome email — placeholder; real integration coming later.
     console.info("[welcome-email] queued for", email);
-    toast.success("Welcome to EquestRai!");
+    toast.success("Welcome to Equestrai!");
     navigate({ to: "/dashboard" });
   };
 
@@ -117,7 +117,7 @@ function SignupPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary font-heading text-lg font-bold text-accent">
             I
           </div>
-          <span className="font-heading text-xl font-semibold text-primary">EquestRai</span>
+          <span className="font-heading text-xl font-semibold text-primary">Equestrai</span>
         </Link>
 
         <h1 className="mt-6 text-center font-heading text-2xl text-primary">

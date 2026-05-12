@@ -20,7 +20,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — EquestRai" },
+      { title: "Dashboard — Equestrai" },
       { name: "description", content: "Your IALHA registry dashboard." },
     ],
   }),

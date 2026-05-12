@@ -49,7 +49,7 @@ type Reg = {
 };
 
 export const Route = createFileRoute("/_app/admin/registrations/$registrationId")({
-  head: () => ({ meta: [{ title: "Review Registration — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Review Registration — Equestrai" }] }),
   component: AdminRegistrationDetail,
 });
 

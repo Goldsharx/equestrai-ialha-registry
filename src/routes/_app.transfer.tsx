@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/_app/transfer")({
   head: () => ({
     meta: [
-      { title: "Transfer Ownership — EquestRai" },
+      { title: "Transfer Ownership — Equestrai" },
       { name: "description", content: "Transfer horse ownership between IALHA members." },
     ],
   }),

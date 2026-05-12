@@ -23,7 +23,7 @@ type Entry = {
 };
 
 export const Route = createFileRoute("/_app/admin/activity")({
-  head: () => ({ meta: [{ title: "Activity Log — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Activity Log — Equestrai" }] }),
   component: AdminActivity,
 });
 

@@ -45,7 +45,7 @@ const empty: Profile = {
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
     meta: [
-      { title: "Profile — EquestRai" },
+      { title: "Profile — Equestrai" },
       { name: "description", content: "Manage your IALHA member profile." },
     ],
   }),

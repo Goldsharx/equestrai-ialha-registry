@@ -2,7 +2,7 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { PaymentPage } from "@/components/PaymentPage";
 
 export const Route = createFileRoute("/_app/transfer/$transferId/pay")({
-  head: () => ({ meta: [{ title: "Transfer Payment — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "Transfer Payment — Equestrai" }] }),
   validateSearch: (s: Record<string, unknown>) => ({
     success: typeof s.success === "string" ? s.success : undefined,
   }),

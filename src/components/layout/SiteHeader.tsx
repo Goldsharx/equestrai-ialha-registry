@@ -58,7 +58,7 @@ export function SiteHeader(_props: { unreadCount?: number } = {}) {
             I
           </div>
           <div className="leading-tight">
-            <div className="font-heading text-lg font-semibold text-accent">EquestRai</div>
+            <div className="font-heading text-lg font-semibold text-accent">Equestrai</div>
             <div className="text-[10px] uppercase tracking-widest text-primary-foreground/70">
               IALHA Registry
             </div>

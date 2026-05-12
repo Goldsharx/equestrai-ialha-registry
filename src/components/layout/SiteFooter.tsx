@@ -5,7 +5,7 @@ export function SiteFooter() {
     <footer className="bg-primary text-primary-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-3 lg:px-8">
         <div>
-          <div className="font-heading text-xl font-semibold text-accent">EquestRai</div>
+          <div className="font-heading text-xl font-semibold text-accent">Equestrai</div>
           <p className="mt-2 text-sm text-primary-foreground/70">
             The official registry platform of the International Andalusian &amp;
             Lusitano Horse Association.
@@ -53,7 +53,7 @@ export function SiteFooter() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-primary-foreground/60 sm:flex-row sm:px-6 lg:px-8">
           <span>&copy; {new Date().getFullYear()} IALHA. All rights reserved.</span>
           <span>
-            Powered by <span className="font-semibold text-accent">EquestRai</span>
+            Powered by <span className="font-semibold text-accent">Equestrai</span>
           </span>
         </div>
       </div>

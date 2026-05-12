@@ -29,7 +29,7 @@ const SEXES = ["all", "stallion", "mare", "gelding", "colt", "filly"];
 const STATUSES = ["all", "approved", "pending", "suspended", "deceased"];
 
 export const Route = createFileRoute("/_app/admin/horses")({
-  head: () => ({ meta: [{ title: "All Horses — EquestRai" }] }),
+  head: () => ({ meta: [{ title: "All Horses — Equestrai" }] }),
   component: AdminHorses,
 });
 

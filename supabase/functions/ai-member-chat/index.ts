@@ -4,7 +4,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `You are EquestRai's IALHA member support assistant.
+const SYSTEM_PROMPT = `You are Equestrai's IALHA member support assistant.
 Help members with horse registration, ownership transfers, payment, and studbook lookups.
 Be concise, friendly, and accurate. If a question requires staff intervention
 (refunds, disputes, identity verification, legal matters, account deletion, or
