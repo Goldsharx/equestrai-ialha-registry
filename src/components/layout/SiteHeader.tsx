@@ -31,8 +31,19 @@ function HeaderLanguageToggle() {
 
 export function SiteHeader(_props: { unreadCount?: number } = {}) {
   const [open, setOpen] = useState(false);
-  const { session } = useAuth();
+  const { session, user, signOut } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate({ to: "/" });
+  };
+
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email ||
+    "Account";
 
   const navLinks = [
     { to: "/", label: t("nav.home") },
