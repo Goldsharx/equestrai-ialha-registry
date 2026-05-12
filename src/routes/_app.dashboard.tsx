@@ -320,5 +320,3 @@ function EmptyState({ text }: { text: string }) {
   return <p className="py-2 text-sm text-muted-foreground">{text}</p>;
 }
 
-// Mark hook unused vars off
-void useState;

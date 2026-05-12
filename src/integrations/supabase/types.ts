@@ -14,38 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      foreign_documents: {
+        Row: {
+          created_at: string
+          document_type: string | null
+          horse_id: string
+          id: string
+          name: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          document_type?: string | null
+          horse_id: string
+          id?: string
+          name: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string | null
+          horse_id?: string
+          id?: string
+          name?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "foreign_documents_horse_id_fkey"
+            columns: ["horse_id"]
+            isOneToOne: false
+            referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      horse_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          horse_id: string
+          id: string
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          horse_id: string
+          id?: string
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          horse_id?: string
+          id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "horse_photos_horse_id_fkey"
+            columns: ["horse_id"]
+            isOneToOne: false
+            referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       horses: {
         Row: {
+          birth_country: string | null
           breed: string | null
+          certificate_url: string | null
+          color: string | null
           created_at: string
           current_owner_id: string
+          dam_id: string | null
+          dam_name: string | null
           date_of_birth: string | null
+          dna_status: string | null
           id: string
+          markings_description: string | null
+          markings_image_url: string | null
+          microchip_number: string | null
           name: string
           registration_number: string | null
           sex: string | null
+          sire_id: string | null
+          sire_name: string | null
+          status: string
           updated_at: string
         }
         Insert: {
+          birth_country?: string | null
           breed?: string | null
+          certificate_url?: string | null
+          color?: string | null
           created_at?: string
           current_owner_id: string
+          dam_id?: string | null
+          dam_name?: string | null
           date_of_birth?: string | null
+          dna_status?: string | null
           id?: string
+          markings_description?: string | null
+          markings_image_url?: string | null
+          microchip_number?: string | null
           name: string
           registration_number?: string | null
           sex?: string | null
+          sire_id?: string | null
+          sire_name?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
+          birth_country?: string | null
           breed?: string | null
+          certificate_url?: string | null
+          color?: string | null
           created_at?: string
           current_owner_id?: string
+          dam_id?: string | null
+          dam_name?: string | null
           date_of_birth?: string | null
+          dna_status?: string | null
           id?: string
+          markings_description?: string | null
+          markings_image_url?: string | null
+          microchip_number?: string | null
           name?: string
           registration_number?: string | null
           sex?: string | null
+          sire_id?: string | null
+          sire_name?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -162,6 +265,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "registrations_horse_id_fkey"
+            columns: ["horse_id"]
+            isOneToOne: false
+            referencedRelation: "horses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transfers: {
+        Row: {
+          created_at: string
+          from_owner_id: string | null
+          from_owner_name: string | null
+          horse_id: string
+          id: string
+          notes: string | null
+          to_owner_id: string
+          to_owner_name: string | null
+          transfer_date: string
+        }
+        Insert: {
+          created_at?: string
+          from_owner_id?: string | null
+          from_owner_name?: string | null
+          horse_id: string
+          id?: string
+          notes?: string | null
+          to_owner_id: string
+          to_owner_name?: string | null
+          transfer_date?: string
+        }
+        Update: {
+          created_at?: string
+          from_owner_id?: string | null
+          from_owner_name?: string | null
+          horse_id?: string
+          id?: string
+          notes?: string | null
+          to_owner_id?: string
+          to_owner_name?: string | null
+          transfer_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transfers_horse_id_fkey"
             columns: ["horse_id"]
             isOneToOne: false
             referencedRelation: "horses"
