@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MarkingsCanvas } from "@/components/MarkingsCanvas";
 
 export const Route = createFileRoute("/_app/register")({
   head: () => ({
