@@ -30,6 +30,7 @@ import { Route as AppAdminRegistrationsRouteImport } from './routes/_app.admin.r
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
 import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
 import { Route as AppRegisterRegistrationIdPayRouteImport } from './routes/_app.register.$registrationId.pay'
+import { Route as AppAdminTransfersTransferIdRouteImport } from './routes/_app.admin.transfers.$transferId'
 import { Route as AppAdminRegistrationsRegistrationIdRouteImport } from './routes/_app.admin.registrations.$registrationId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -138,6 +139,12 @@ const AppRegisterRegistrationIdPayRoute =
     path: '/$registrationId/pay',
     getParentRoute: () => AppRegisterRoute,
   } as any)
+const AppAdminTransfersTransferIdRoute =
+  AppAdminTransfersTransferIdRouteImport.update({
+    id: '/$transferId',
+    path: '/$transferId',
+    getParentRoute: () => AppAdminTransfersRoute,
+  } as any)
 const AppAdminRegistrationsRegistrationIdRoute =
   AppAdminRegistrationsRegistrationIdRouteImport.update({
     id: '/$registrationId',
@@ -159,10 +166,11 @@ export interface FileRoutesByFullPath {
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
   '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
-  '/admin/transfers': typeof AppAdminTransfersRoute
+  '/admin/transfers': typeof AppAdminTransfersRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
+  '/admin/transfers/$transferId': typeof AppAdminTransfersTransferIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -181,10 +189,11 @@ export interface FileRoutesByTo {
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
   '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
-  '/admin/transfers': typeof AppAdminTransfersRoute
+  '/admin/transfers': typeof AppAdminTransfersRouteWithChildren
   '/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
+  '/admin/transfers/$transferId': typeof AppAdminTransfersTransferIdRoute
   '/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -206,10 +215,11 @@ export interface FileRoutesById {
   '/_public/studbook': typeof PublicStudbookRouteWithChildren
   '/_public/': typeof PublicIndexRoute
   '/_app/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
-  '/_app/admin/transfers': typeof AppAdminTransfersRoute
+  '/_app/admin/transfers': typeof AppAdminTransfersRouteWithChildren
   '/_app/horses/$horseId': typeof AppHorsesHorseIdRoute
   '/_public/studbook/$horseId': typeof PublicStudbookHorseIdRoute
   '/_app/admin/registrations/$registrationId': typeof AppAdminRegistrationsRegistrationIdRoute
+  '/_app/admin/transfers/$transferId': typeof AppAdminTransfersTransferIdRoute
   '/_app/register/$registrationId/pay': typeof AppRegisterRegistrationIdPayRoute
   '/_app/register/$registrationId/status': typeof AppRegisterRegistrationIdStatusRoute
   '/_app/transfer/$transferId/pay': typeof AppTransferTransferIdPayRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/horses/$horseId'
     | '/studbook/$horseId'
     | '/admin/registrations/$registrationId'
+    | '/admin/transfers/$transferId'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/horses/$horseId'
     | '/studbook/$horseId'
     | '/admin/registrations/$registrationId'
+    | '/admin/transfers/$transferId'
     | '/register/$registrationId/pay'
     | '/register/$registrationId/status'
     | '/transfer/$transferId/pay'
@@ -280,6 +292,7 @@ export interface FileRouteTypes {
     | '/_app/horses/$horseId'
     | '/_public/studbook/$horseId'
     | '/_app/admin/registrations/$registrationId'
+    | '/_app/admin/transfers/$transferId'
     | '/_app/register/$registrationId/pay'
     | '/_app/register/$registrationId/status'
     | '/_app/transfer/$transferId/pay'
@@ -441,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRegisterRegistrationIdPayRouteImport
       parentRoute: typeof AppRegisterRoute
     }
+    '/_app/admin/transfers/$transferId': {
+      id: '/_app/admin/transfers/$transferId'
+      path: '/$transferId'
+      fullPath: '/admin/transfers/$transferId'
+      preLoaderRoute: typeof AppAdminTransfersTransferIdRouteImport
+      parentRoute: typeof AppAdminTransfersRoute
+    }
     '/_app/admin/registrations/$registrationId': {
       id: '/_app/admin/registrations/$registrationId'
       path: '/$registrationId'
@@ -465,14 +485,25 @@ const AppAdminRegistrationsRouteWithChildren =
     AppAdminRegistrationsRouteChildren,
   )
 
+interface AppAdminTransfersRouteChildren {
+  AppAdminTransfersTransferIdRoute: typeof AppAdminTransfersTransferIdRoute
+}
+
+const AppAdminTransfersRouteChildren: AppAdminTransfersRouteChildren = {
+  AppAdminTransfersTransferIdRoute: AppAdminTransfersTransferIdRoute,
+}
+
+const AppAdminTransfersRouteWithChildren =
+  AppAdminTransfersRoute._addFileChildren(AppAdminTransfersRouteChildren)
+
 interface AppAdminRouteChildren {
   AppAdminRegistrationsRoute: typeof AppAdminRegistrationsRouteWithChildren
-  AppAdminTransfersRoute: typeof AppAdminTransfersRoute
+  AppAdminTransfersRoute: typeof AppAdminTransfersRouteWithChildren
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
   AppAdminRegistrationsRoute: AppAdminRegistrationsRouteWithChildren,
-  AppAdminTransfersRoute: AppAdminTransfersRoute,
+  AppAdminTransfersRoute: AppAdminTransfersRouteWithChildren,
 }
 
 const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
