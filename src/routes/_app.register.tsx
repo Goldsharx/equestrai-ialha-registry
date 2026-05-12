@@ -1283,12 +1283,19 @@ function StepReview({
             </span>
           </label>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" onClick={onSaveDraft} disabled={saving || submitting}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => { console.log("[ui] Save as Draft clicked"); onSaveDraft(); }}
+              disabled={saving || submitting}
+            >
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save as Draft
             </Button>
             <Button
+              type="button"
               className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
-              onClick={onSubmit}
+              onClick={() => { console.log("[ui] Submit & Pay clicked"); onSubmit(); }}
               disabled={saving || submitting || !data.terms_accepted}
             >
               {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
