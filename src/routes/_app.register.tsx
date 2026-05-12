@@ -698,12 +698,12 @@ function ParentSearch({
           <Button
             id={`p-${label}`}
             variant="outline"
-            className="h-10 w-full justify-start font-normal"
+            className="h-9 w-full justify-start px-3 text-left font-normal"
           >
-            <Search className="mr-2 h-4 w-4" /> {display}
+            <Search className="mr-2 h-4 w-4" /> <span className="truncate">{display}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-2" align="start">
+        <PopoverContent className="w-[--radix-popover-trigger-width] min-w-80 p-2" align="start">
           <Input
             placeholder="Type a name…"
             value={query}
