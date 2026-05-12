@@ -277,7 +277,7 @@ function DashboardCard({
       <header className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-accent">
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4 shrink-0" />
           </div>
           <h2 className="font-heading text-lg text-primary">{title}</h2>
         </div>
@@ -315,14 +315,14 @@ function QuickAction({
       asChild
       variant={primary ? "default" : "outline"}
       className={cn(
-        "h-auto justify-start gap-2 py-3",
+        "h-auto justify-start gap-2 py-3 whitespace-normal text-left",
         primary
           ? "bg-accent text-accent-foreground hover:bg-accent/90"
           : "border-border hover:border-accent hover:bg-accent/10",
       )}
     >
       <Link to={to}>
-        <Icon className="h-4 w-4" />
+        <Icon className="h-4 w-4 shrink-0" />
         <span className="text-sm font-semibold">{label}</span>
       </Link>
     </Button>
