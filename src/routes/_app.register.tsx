@@ -264,10 +264,13 @@ function RegisterWizardPage() {
         "create-stripe-checkout",
         { body: { registration_id: id, return_url: returnUrl } },
       );
+      console.log("Stripe response:", stripeData, stripeError);
       if (stripeError) throw stripeError;
-      console.log("[submit-and-pay] stripe response", stripeData);
       const checkoutUrl = (stripeData as { checkout_url?: string } | null)?.checkout_url;
       if (!checkoutUrl) throw new Error("No checkout URL returned from payment service");
+      if (new URL(checkoutUrl).origin === window.location.origin) {
+        throw new Error("Payment service returned an in-app URL instead of Stripe Checkout");
+      }
       window.location.href = checkoutUrl;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
