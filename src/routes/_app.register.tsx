@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Check, ChevronRight, Loader2, Search, Upload } from "lucide-react";
+import { Calendar as CalendarIcon, Check, ChevronRight, Loader2, Search, Trash2, Upload } from "lucide-react";
 import { useUser } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,6 +57,10 @@ type WizardData = {
   breeder_contact: string;
   stallion_owner_name: string;
   stallion_owner_contact: string;
+  markings_description: string;
+  no_markings: boolean;
+  add_ons: string[];
+  terms_accepted: boolean;
 };
 
 const EMPTY: WizardData = {
@@ -78,7 +85,26 @@ const EMPTY: WizardData = {
   breeder_contact: "",
   stallion_owner_name: "",
   stallion_owner_contact: "",
+  markings_description: "",
+  no_markings: false,
+  add_ons: [],
+  terms_accepted: false,
 };
+
+const PHOTO_SLOTS: { code: string; label: string; required: boolean }[] = [
+  { code: "left", label: "Left Side", required: true },
+  { code: "right", label: "Right Side", required: true },
+  { code: "front", label: "Front", required: true },
+  { code: "rear", label: "Rear", required: true },
+  { code: "brand", label: "Brand", required: false },
+  { code: "other", label: "Other", required: false },
+];
+
+const ADDONS = [
+  { code: "addon_dna_kit", label: "DNA Kit", amount: 50 },
+  { code: "addon_microchip", label: "Microchip", amount: 75 },
+  { code: "addon_expedited", label: "Expedited Processing", amount: 100 },
+];
 
 const STEPS = [
   { id: 1, label: "Type" },
@@ -92,48 +118,57 @@ const COLORS = ["Bay", "Black", "Gray", "Chestnut", "Palomino", "Buckskin", "Dun
 
 function RegisterWizardPage() {
   const user = useUser();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<WizardData>(EMPTY);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const update = (patch: Partial<WizardData>) => setData((d) => ({ ...d, ...patch }));
 
-  const persist = async (next: WizardData) => {
-    if (!user?.id) return;
+  const buildPayload = (next: WizardData) => ({
+    applicant_id: user!.id,
+    status: "draft" as const,
+    type: next.type,
+    horse_name: next.name_choice_1 || null,
+    name_choice_1: next.name_choice_1 || null,
+    name_choice_2: next.name_choice_2 || null,
+    name_choice_3: next.name_choice_3 || null,
+    birth_date: next.birth_date ? format(next.birth_date, "yyyy-MM-dd") : null,
+    sex: next.sex || null,
+    color: next.color || null,
+    birth_country: next.birth_country || null,
+    microchip_number: next.microchip_number || null,
+    dna_case_number: next.dna_case_number || null,
+    sire_id: next.sire_id,
+    sire_name: next.sire_name || null,
+    dam_id: next.dam_id,
+    dam_name: next.dam_name || null,
+    foreign_registry_name: next.foreign_registry_name || null,
+    foreign_registration_number: next.foreign_registration_number || null,
+    breeder_name: next.breeder_name || null,
+    breeder_contact: next.breeder_contact || null,
+    stallion_owner_name: next.stallion_owner_name || null,
+    stallion_owner_contact: next.stallion_owner_contact || null,
+    markings_description: next.no_markings ? "NONE" : (next.markings_description || null),
+    no_markings: next.no_markings,
+    add_ons: next.add_ons,
+    terms_accepted: next.terms_accepted,
+  });
+
+  const persist = async (next: WizardData): Promise<string | null> => {
+    if (!user?.id) return null;
     setSaving(true);
     try {
-      const payload = {
-        applicant_id: user.id,
-        status: "draft" as const,
-        type: next.type,
-        horse_name: next.name_choice_1 || null,
-        name_choice_1: next.name_choice_1 || null,
-        name_choice_2: next.name_choice_2 || null,
-        name_choice_3: next.name_choice_3 || null,
-        birth_date: next.birth_date ? format(next.birth_date, "yyyy-MM-dd") : null,
-        sex: next.sex || null,
-        color: next.color || null,
-        birth_country: next.birth_country || null,
-        microchip_number: next.microchip_number || null,
-        dna_case_number: next.dna_case_number || null,
-        sire_id: next.sire_id,
-        sire_name: next.sire_name || null,
-        dam_id: next.dam_id,
-        dam_name: next.dam_name || null,
-        foreign_registry_name: next.foreign_registry_name || null,
-        foreign_registration_number: next.foreign_registration_number || null,
-        breeder_name: next.breeder_name || null,
-        breeder_contact: next.breeder_contact || null,
-        stallion_owner_name: next.stallion_owner_name || null,
-        stallion_owner_contact: next.stallion_owner_contact || null,
-      };
+      const payload = buildPayload(next);
       if (registrationId) {
         const { error } = await supabase
           .from("registrations")
           .update(payload)
           .eq("id", registrationId);
         if (error) throw error;
+        return registrationId;
       } else {
         const { data: row, error } = await supabase
           .from("registrations")
@@ -142,10 +177,12 @@ function RegisterWizardPage() {
           .single();
         if (error) throw error;
         setRegistrationId(row.id);
+        return row.id;
       }
     } catch (err) {
       console.error(err);
       toast.error("Couldn't save draft");
+      return null;
     } finally {
       setSaving(false);
     }
@@ -157,6 +194,22 @@ function RegisterWizardPage() {
   };
 
   const goBack = () => setStep((s) => Math.max(1, s - 1));
+
+  const handleSaveDraft = async () => {
+    const id = await persist(data);
+    if (id) toast.success("Draft saved");
+  };
+
+  const handleSubmitAndPay = async () => {
+    if (!data.terms_accepted) {
+      toast.error("Please accept the terms to continue");
+      return;
+    }
+    setSubmitting(true);
+    const id = await persist(data);
+    setSubmitting(false);
+    if (id) navigate({ to: "/register/$registrationId/pay", params: { registrationId: id } });
+  };
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -180,12 +233,25 @@ function RegisterWizardPage() {
 
       {step === 3 && <StepParentage data={data} update={update} userId={user?.id} />}
 
-      {step >= 4 && (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            Step {step}: {STEPS[step - 1].label} — coming next.
-          </CardContent>
-        </Card>
+      {step === 4 && (
+        <StepPhotosMarkings
+          data={data}
+          update={update}
+          userId={user?.id}
+          ensureRegistration={() => persist(data)}
+          registrationId={registrationId}
+        />
+      )}
+
+      {step === 5 && (
+        <StepReview
+          data={data}
+          onSaveDraft={handleSaveDraft}
+          onSubmit={handleSubmitAndPay}
+          saving={saving}
+          submitting={submitting}
+          update={update}
+        />
       )}
 
       <div className="flex items-center justify-between">
@@ -686,4 +752,422 @@ function Field({
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
+}
+
+// ============= Step 4: Photos & Markings =============
+
+type PhotoRow = { id: string; url: string; photo_type: string | null };
+
+function StepPhotosMarkings({
+  data,
+  update,
+  userId,
+  ensureRegistration,
+  registrationId,
+}: {
+  data: WizardData;
+  update: (p: Partial<WizardData>) => void;
+  userId: string | undefined;
+  ensureRegistration: () => Promise<string | null>;
+  registrationId: string | null;
+}) {
+  const [photos, setPhotos] = useState<PhotoRow[]>([]);
+  const [uploading, setUploading] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!registrationId) return;
+    (async () => {
+      const { data: rows } = await supabase
+        .from("horse_photos")
+        .select("id,url,photo_type")
+        .eq("registration_id", registrationId);
+      setPhotos((rows ?? []) as PhotoRow[]);
+    })();
+  }, [registrationId]);
+
+  const handleUpload = async (slot: string, file: File) => {
+    if (!userId) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Photo must be under 10MB");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+      toast.error("Only JPG or PNG allowed");
+      return;
+    }
+    setUploading(slot);
+    try {
+      const regId = registrationId ?? (await ensureRegistration());
+      if (!regId) throw new Error("No registration");
+      const ext = file.name.split(".").pop();
+      const path = `${userId}/registration-${regId}/${slot}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("photos")
+        .upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("photos").getPublicUrl(path);
+      // Replace any existing photo for this slot in this registration
+      await supabase
+        .from("horse_photos")
+        .delete()
+        .eq("registration_id", regId)
+        .eq("photo_type", slot);
+      const { data: row, error: insErr } = await supabase
+        .from("horse_photos")
+        .insert({
+          registration_id: regId,
+          url: pub.publicUrl,
+          photo_type: slot,
+        })
+        .select("id,url,photo_type")
+        .single();
+      if (insErr) throw insErr;
+      setPhotos((prev) => [...prev.filter((p) => p.photo_type !== slot), row as PhotoRow]);
+      toast.success("Photo uploaded");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const handleDelete = async (photo: PhotoRow) => {
+    await supabase.from("horse_photos").delete().eq("id", photo.id);
+    setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-serif text-primary">Required Photos</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Upload clear photos of all four sides. JPG or PNG, max 10MB each.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {PHOTO_SLOTS.map((slot) => {
+              const existing = photos.find((p) => p.photo_type === slot.code);
+              return (
+                <PhotoSlot
+                  key={slot.code}
+                  slot={slot}
+                  existing={existing}
+                  uploading={uploading === slot.code}
+                  onUpload={(f) => handleUpload(slot.code, f)}
+                  onDelete={existing ? () => handleDelete(existing) : undefined}
+                />
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-serif text-primary">Markings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <label className="flex items-center gap-2">
+            <Checkbox
+              checked={data.no_markings}
+              onCheckedChange={(c) => update({ no_markings: !!c, markings_description: c ? "NONE" : "" })}
+            />
+            <span className="text-sm">This horse has no markings</span>
+          </label>
+
+          {!data.no_markings && (
+            <>
+              <div className="flex h-48 items-center justify-center rounded-md border-2 border-dashed border-secondary/40 bg-cream/50 text-sm text-muted-foreground">
+                <div className="text-center">
+                  <p className="font-serif text-lg text-primary">Digital Markings Canvas</p>
+                  <p className="text-xs">Draw your horse's markings here</p>
+                </div>
+              </div>
+              <Textarea
+                placeholder="Describe markings (e.g., star on forehead, white left hind sock)…"
+                value={data.markings_description}
+                maxLength={1000}
+                onChange={(e) => update({ markings_description: e.target.value })}
+                rows={4}
+              />
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function PhotoSlot({
+  slot,
+  existing,
+  uploading,
+  onUpload,
+  onDelete,
+}: {
+  slot: { code: string; label: string; required: boolean };
+  existing?: PhotoRow;
+  uploading: boolean;
+  onUpload: (f: File) => void;
+  onDelete?: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-xs">
+          {slot.label} {slot.required && <span className="text-destructive">*</span>}
+        </Label>
+        {existing && onDelete && (
+          <button type="button" onClick={onDelete} className="text-muted-foreground hover:text-destructive">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+      <label className={cn(
+        "relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden rounded-md border-2 border-dashed bg-muted/30 transition-colors hover:border-secondary",
+        existing ? "border-secondary/40" : "border-muted-foreground/30",
+      )}>
+        {existing ? (
+          <img src={existing.url} alt={slot.label} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex flex-col items-center gap-1 text-muted-foreground">
+            {uploading ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : (
+              <>
+                <HorseSilhouette angle={slot.code} />
+                <span className="text-xs">Click to upload</span>
+              </>
+            )}
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/jpeg,image/png"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onUpload(f);
+            e.target.value = "";
+          }}
+        />
+      </label>
+    </div>
+  );
+}
+
+function HorseSilhouette({ angle }: { angle: string }) {
+  // Minimal directional indicator
+  const labels: Record<string, string> = {
+    left: "← Left",
+    right: "Right →",
+    front: "Front",
+    rear: "Rear",
+    brand: "Brand",
+    other: "Other",
+  };
+  return (
+    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-[10px] font-medium">
+      {labels[angle] ?? angle}
+    </div>
+  );
+}
+
+// ============= Step 5: Review & Submit =============
+
+function StepReview({
+  data,
+  onSaveDraft,
+  onSubmit,
+  saving,
+  submitting,
+  update,
+}: {
+  data: WizardData;
+  onSaveDraft: () => void;
+  onSubmit: () => void;
+  saving: boolean;
+  submitting: boolean;
+  update: (p: Partial<WizardData>) => void;
+}) {
+  const { data: feeRows = [] } = useQuery({
+    queryKey: ["fee_schedule"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("fee_schedule")
+        .select("code,description,amount");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const fees = useMemo(() => {
+    const items: { description: string; amount: number }[] = [];
+    const codeMap = new Map(feeRows.map((f) => [f.code, f]));
+    const baseCode = data.type
+      ? `reg_${data.type}`
+      : null;
+    if (baseCode && codeMap.get(baseCode)) {
+      const f = codeMap.get(baseCode)!;
+      items.push({ description: f.description, amount: Number(f.amount) });
+    }
+    if (data.birth_date) {
+      const ageYears = (Date.now() - data.birth_date.getTime()) / (365.25 * 86400000);
+      if (ageYears > 2 && codeMap.get("late_fee")) {
+        const f = codeMap.get("late_fee")!;
+        items.push({ description: f.description, amount: Number(f.amount) });
+      }
+    }
+    for (const code of data.add_ons) {
+      const f = codeMap.get(code);
+      if (f) items.push({ description: f.description, amount: Number(f.amount) });
+    }
+    return items;
+  }, [feeRows, data.type, data.birth_date, data.add_ons]);
+
+  const total = fees.reduce((s, f) => s + f.amount, 0);
+
+  const toggleAddon = (code: string) => {
+    const next = data.add_ons.includes(code)
+      ? data.add_ons.filter((c) => c !== code)
+      : [...data.add_ons, code];
+    update({ add_ons: next });
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle className="font-serif text-primary">Registration Summary</CardTitle></CardHeader>
+        <CardContent className="space-y-6">
+          <Section title="Type">
+            <SummaryRow label="Registration Type" value={prettyType(data.type)} />
+          </Section>
+          <Section title="Horse Details">
+            <SummaryRow label="Name Choice 1" value={data.name_choice_1} />
+            <SummaryRow label="Name Choice 2" value={data.name_choice_2} />
+            <SummaryRow label="Name Choice 3" value={data.name_choice_3} />
+            <SummaryRow label="Birth Date" value={data.birth_date ? format(data.birth_date, "PPP") : ""} />
+            <SummaryRow label="Sex" value={data.sex} />
+            <SummaryRow label="Color" value={data.color} />
+            <SummaryRow label="Birth Country" value={data.birth_country} />
+            <SummaryRow label="Microchip" value={data.microchip_number} />
+            <SummaryRow label="DNA Case #" value={data.dna_case_number} />
+          </Section>
+          <Section title="Parentage">
+            <SummaryRow label="Sire" value={data.sire_name} />
+            <SummaryRow label="Dam" value={data.dam_name} />
+            <SummaryRow label="Breeder" value={data.breeder_name} />
+            <SummaryRow label="Stallion Owner" value={data.stallion_owner_name} />
+            {data.type === "purebred_foreign" && (
+              <>
+                <SummaryRow label="Foreign Registry" value={data.foreign_registry_name} />
+                <SummaryRow label="Foreign Reg #" value={data.foreign_registration_number} />
+              </>
+            )}
+          </Section>
+          <Section title="Markings">
+            <SummaryRow
+              label="Markings"
+              value={data.no_markings ? "None" : (data.markings_description || "—")}
+            />
+          </Section>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="font-serif text-primary">Add-ons</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {ADDONS.map((a) => (
+            <label key={a.code} className="flex items-center justify-between rounded-md border p-3">
+              <span className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={data.add_ons.includes(a.code)}
+                  onCheckedChange={() => toggleAddon(a.code)}
+                />
+                {a.label}
+              </span>
+              <span className="text-sm font-medium">${a.amount.toFixed(2)}</span>
+            </label>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="font-serif text-primary">Fee Breakdown</CardTitle></CardHeader>
+        <CardContent>
+          <table className="w-full text-sm">
+            <tbody>
+              {fees.map((f, i) => (
+                <tr key={i} className="border-b last:border-0">
+                  <td className="py-2">{f.description}</td>
+                  <td className="py-2 text-right">${f.amount.toFixed(2)}</td>
+                </tr>
+              ))}
+              <tr className="border-t-2 border-secondary">
+                <td className="py-3 font-bold text-primary">Total</td>
+                <td className="py-3 text-right text-lg font-bold text-primary">${total.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-4 pt-6">
+          <label className="flex items-start gap-2">
+            <Checkbox
+              checked={data.terms_accepted}
+              onCheckedChange={(c) => update({ terms_accepted: !!c })}
+            />
+            <span className="text-sm">
+              I certify this information is accurate and complete.
+            </span>
+          </label>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="outline" onClick={onSaveDraft} disabled={saving || submitting}>
+              Save as Draft
+            </Button>
+            <Button
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
+              onClick={onSubmit}
+              disabled={saving || submitting || !data.terms_accepted}
+            >
+              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Submit & Pay
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h3 className="mb-2 font-serif text-sm uppercase tracking-wide text-secondary">{title}</h3>
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">{children}</dl>
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="flex justify-between gap-4 border-b py-1.5 text-sm">
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="font-medium text-foreground">{value || "—"}</dd>
+    </div>
+  );
+}
+
+function prettyType(t: RegistrationType | null): string {
+  switch (t) {
+    case "purebred_ialha": return "Purebred (IALHA-Bred)";
+    case "purebred_foreign": return "Purebred (Foreign-Bred)";
+    case "half_bred": return "Half-Bred";
+    default: return "";
+  }
 }
