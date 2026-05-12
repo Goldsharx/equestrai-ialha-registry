@@ -437,7 +437,11 @@ function StepDetails({
                 mode="single"
                 selected={data.birth_date ?? undefined}
                 onSelect={(d) => update({ birth_date: d ?? null })}
-                disabled={(d) => d > new Date() || d < new Date("1950-01-01")}
+                disabled={(d) => d > new Date() || d < new Date("1990-01-01")}
+                captionLayout="dropdown"
+                fromYear={1990}
+                toYear={new Date().getFullYear()}
+                defaultMonth={data.birth_date ?? new Date()}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
               />
