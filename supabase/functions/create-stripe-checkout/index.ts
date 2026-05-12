@@ -16,9 +16,12 @@ Deno.serve(async (req) => {
   try {
     const { registration_id, transfer_id, return_url } = await req.json();
     if (!return_url) throw new Error("return_url is required");
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const stripeKey =
+      Deno.env.get("STRIPE_SECRET_KEY") ??
+      Deno.env.get("STRIPE_SANDBOX_API_KEY") ??
+      Deno.env.get("STRIPE_LIVE_API_KEY");
     if (!stripeKey) {
-      throw new Error("Stripe Checkout is not configured: missing STRIPE_SECRET_KEY");
+      throw new Error("Stripe Checkout is not configured: missing Stripe secret key");
     }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
