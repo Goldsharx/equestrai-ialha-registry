@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Menu, X, Languages } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Menu, X, Languages, UserCircle, LogOut, LayoutDashboard, Heart, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function HeaderLanguageToggle() {
   const { lang, setLang } = useLanguage();
