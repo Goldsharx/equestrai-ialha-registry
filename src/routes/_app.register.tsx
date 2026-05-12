@@ -682,40 +682,80 @@ function ForeignDocUpload({
   userId,
   value,
   onChange,
+  onExtract,
 }: {
   userId: string | undefined;
   value: string | null;
   onChange: (path: string | null) => void;
+  onExtract: (fields: Partial<WizardData>) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [extracting, setExtracting] = useState(false);
+  const [extracted, setExtracted] = useState<Record<string, any> | null>(null);
+  const [confidence, setConfidence] = useState<number | null>(null);
 
   const onFile = async (file: File) => {
     if (!userId) return;
     setUploading(true);
     try {
       const path = `${userId}/foreign-${Date.now()}-${file.name}`;
-      const { error } = await supabase.storage.from("documents").upload(path, file, {
-        upsert: false,
-      });
+      const { error } = await supabase.storage.from("documents").upload(path, file, { upsert: false });
       if (error) throw error;
       onChange(path);
       toast.success("Document uploaded");
+
+      // Trigger AI extraction
+      setExtracting(true);
+      const { data: signed } = await supabase.storage.from("documents").createSignedUrl(path, 600);
+      const { data: result, error: fnErr } = await supabase.functions.invoke("ai-extract-document", {
+        body: { document_id: path, file_url: signed?.signedUrl },
+      });
+      if (fnErr) throw fnErr;
+      const fields = (result as any)?.extracted ?? {};
+      setExtracted(fields);
+      setConfidence(typeof fields.confidence === "number" ? fields.confidence : null);
+
+      // Pre-fill wizard fields the user can still edit
+      const patch: Partial<WizardData> = {};
+      if (fields.registry_name) patch.foreign_registry_name = fields.registry_name;
+      if (fields.registration_number) patch.foreign_registration_number = fields.registration_number;
+      if (fields.horse_name && !fields.name_choice_1) patch.name_choice_1 = fields.horse_name;
+      if (fields.sex) patch.sex = String(fields.sex).toLowerCase();
+      if (fields.color) patch.color = fields.color;
+      if (fields.birth_country) patch.birth_country = fields.birth_country;
+      if (fields.microchip_number) patch.microchip_number = fields.microchip_number;
+      if (fields.sire_name) patch.sire_name = fields.sire_name;
+      if (fields.dam_name) patch.dam_name = fields.dam_name;
+      if (fields.breeder_name) patch.breeder_name = fields.breeder_name;
+      onExtract(patch);
+      toast.success("Extracted — please verify the fields below");
     } catch (err) {
       console.error(err);
-      toast.error("Upload failed");
+      toast.error("Upload or extraction failed");
     } finally {
       setUploading(false);
+      setExtracting(false);
     }
   };
 
+  const confidenceBadge = () => {
+    if (confidence == null) return null;
+    const pct = Math.round(confidence * 100);
+    const tone =
+      pct >= 85 ? "bg-green-100 text-green-900 border-green-300"
+      : pct >= 60 ? "bg-yellow-100 text-yellow-900 border-yellow-300"
+      : "bg-destructive/10 text-destructive border-destructive/30";
+    return <span className={cn("rounded-full border px-2 py-0.5 text-xs font-semibold", tone)}>Confidence {pct}%</span>;
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <Label>Foreign Registry Certificate</Label>
-      <div className="flex items-center gap-3">
-        <Button asChild variant="outline" disabled={uploading}>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button asChild variant="outline" disabled={uploading || extracting}>
           <label className="cursor-pointer">
             <Upload className="mr-2 h-4 w-4" />
-            {uploading ? "Uploading…" : "Choose file"}
+            {uploading ? "Uploading…" : extracting ? "Extracting…" : "Choose file"}
             <input
               type="file"
               accept="application/pdf,image/*"
@@ -727,10 +767,26 @@ function ForeignDocUpload({
             />
           </label>
         </Button>
-        {value && (
-          <span className="truncate text-xs text-muted-foreground">{value.split("/").pop()}</span>
-        )}
+        {value && <span className="truncate text-xs text-muted-foreground">{value.split("/").pop()}</span>}
+        {extracting && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+        {confidenceBadge()}
       </div>
+
+      {extracted && (
+        <div className="rounded-md border bg-muted/30 p-3 text-xs">
+          <p className="mb-2 font-semibold text-primary">AI-extracted fields (verify above)</p>
+          <dl className="grid grid-cols-1 gap-1 sm:grid-cols-2">
+            {Object.entries(extracted)
+              .filter(([k]) => k !== "confidence")
+              .map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-2 border-b py-0.5">
+                  <dt className="text-muted-foreground">{k.replace(/_/g, " ")}</dt>
+                  <dd className="font-medium">{v ? String(v) : "—"}</dd>
+                </div>
+              ))}
+          </dl>
+        </div>
+      )}
     </div>
   );
 }
