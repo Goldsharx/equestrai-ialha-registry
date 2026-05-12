@@ -29,6 +29,7 @@ import { Route as AppAdminTransfersRouteImport } from './routes/_app.admin.trans
 import { Route as AppAdminRegistrationsRouteImport } from './routes/_app.admin.registrations'
 import { Route as AppAdminMembersRouteImport } from './routes/_app.admin.members'
 import { Route as AppAdminHorsesRouteImport } from './routes/_app.admin.horses'
+import { Route as AppAdminFeesRouteImport } from './routes/_app.admin.fees'
 import { Route as AppTransferTransferIdPayRouteImport } from './routes/_app.transfer.$transferId.pay'
 import { Route as AppRegisterRegistrationIdStatusRouteImport } from './routes/_app.register.$registrationId.status'
 import { Route as AppRegisterRegistrationIdPayRouteImport } from './routes/_app.register.$registrationId.pay'
@@ -133,6 +134,11 @@ const AppAdminHorsesRoute = AppAdminHorsesRouteImport.update({
   path: '/horses',
   getParentRoute: () => AppAdminRoute,
 } as any)
+const AppAdminFeesRoute = AppAdminFeesRouteImport.update({
+  id: '/fees',
+  path: '/fees',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppTransferTransferIdPayRoute =
   AppTransferTransferIdPayRouteImport.update({
     id: '/$transferId/pay',
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
+  '/admin/fees': typeof AppAdminFeesRoute
   '/admin/horses': typeof AppAdminHorsesRoute
   '/admin/members': typeof AppAdminMembersRoute
   '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/register': typeof AppRegisterRouteWithChildren
   '/transfer': typeof AppTransferRouteWithChildren
   '/studbook': typeof PublicStudbookRouteWithChildren
+  '/admin/fees': typeof AppAdminFeesRoute
   '/admin/horses': typeof AppAdminHorsesRoute
   '/admin/members': typeof AppAdminMembersRoute
   '/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/_app/transfer': typeof AppTransferRouteWithChildren
   '/_public/studbook': typeof PublicStudbookRouteWithChildren
   '/_public/': typeof PublicIndexRoute
+  '/_app/admin/fees': typeof AppAdminFeesRoute
   '/_app/admin/horses': typeof AppAdminHorsesRoute
   '/_app/admin/members': typeof AppAdminMembersRoute
   '/_app/admin/registrations': typeof AppAdminRegistrationsRouteWithChildren
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/transfer'
     | '/studbook'
+    | '/admin/fees'
     | '/admin/horses'
     | '/admin/members'
     | '/admin/registrations'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/transfer'
     | '/studbook'
+    | '/admin/fees'
     | '/admin/horses'
     | '/admin/members'
     | '/admin/registrations'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/_app/transfer'
     | '/_public/studbook'
     | '/_public/'
+    | '/_app/admin/fees'
     | '/_app/admin/horses'
     | '/_app/admin/members'
     | '/_app/admin/registrations'
@@ -471,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminHorsesRouteImport
       parentRoute: typeof AppAdminRoute
     }
+    '/_app/admin/fees': {
+      id: '/_app/admin/fees'
+      path: '/fees'
+      fullPath: '/admin/fees'
+      preLoaderRoute: typeof AppAdminFeesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/_app/transfer/$transferId/pay': {
       id: '/_app/transfer/$transferId/pay'
       path: '/$transferId/pay'
@@ -535,6 +554,7 @@ const AppAdminTransfersRouteWithChildren =
   AppAdminTransfersRoute._addFileChildren(AppAdminTransfersRouteChildren)
 
 interface AppAdminRouteChildren {
+  AppAdminFeesRoute: typeof AppAdminFeesRoute
   AppAdminHorsesRoute: typeof AppAdminHorsesRoute
   AppAdminMembersRoute: typeof AppAdminMembersRoute
   AppAdminRegistrationsRoute: typeof AppAdminRegistrationsRouteWithChildren
@@ -542,6 +562,7 @@ interface AppAdminRouteChildren {
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminFeesRoute: AppAdminFeesRoute,
   AppAdminHorsesRoute: AppAdminHorsesRoute,
   AppAdminMembersRoute: AppAdminMembersRoute,
   AppAdminRegistrationsRoute: AppAdminRegistrationsRouteWithChildren,
