@@ -132,9 +132,9 @@ function HorseDetailPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
-            <Link to="/transfer" search={{ horse: horseId }}>
+            <a href={`/transfer?horse=${horseId}`}>
               <ArrowRightLeft className="mr-2 h-4 w-4" /> Transfer Ownership
-            </Link>
+            </a>
           </Button>
           {horse.certificate_url && (
             <Button asChild variant="outline">
