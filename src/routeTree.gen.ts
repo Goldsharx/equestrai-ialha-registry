@@ -23,6 +23,7 @@ import { Route as AppHorsesRouteImport } from './routes/_app.horses'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppChatRouteImport } from './routes/_app.chat'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as AppHorsesHorseIdRouteImport } from './routes/_app.horses.$horseId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -92,6 +93,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHorsesHorseIdRoute = AppHorsesHorseIdRouteImport.update({
+  id: '/$horseId',
+  path: '/$horseId',
+  getParentRoute: () => AppHorsesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -100,12 +106,13 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRoute
   '/chat': typeof AppChatRoute
   '/dashboard': typeof AppDashboardRoute
-  '/horses': typeof AppHorsesRoute
+  '/horses': typeof AppHorsesRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/register': typeof AppRegisterRoute
   '/transfer': typeof AppTransferRoute
   '/studbook': typeof PublicStudbookRoute
+  '/horses/$horseId': typeof AppHorsesHorseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
@@ -114,12 +121,13 @@ export interface FileRoutesByTo {
   '/admin': typeof AppAdminRoute
   '/chat': typeof AppChatRoute
   '/dashboard': typeof AppDashboardRoute
-  '/horses': typeof AppHorsesRoute
+  '/horses': typeof AppHorsesRouteWithChildren
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/register': typeof AppRegisterRoute
   '/transfer': typeof AppTransferRoute
   '/studbook': typeof PublicStudbookRoute
+  '/horses/$horseId': typeof AppHorsesHorseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,13 +138,14 @@ export interface FileRoutesById {
   '/_app/admin': typeof AppAdminRoute
   '/_app/chat': typeof AppChatRoute
   '/_app/dashboard': typeof AppDashboardRoute
-  '/_app/horses': typeof AppHorsesRoute
+  '/_app/horses': typeof AppHorsesRouteWithChildren
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/register': typeof AppRegisterRoute
   '/_app/transfer': typeof AppTransferRoute
   '/_public/studbook': typeof PublicStudbookRoute
   '/_public/': typeof PublicIndexRoute
+  '/_app/horses/$horseId': typeof AppHorsesHorseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/transfer'
     | '/studbook'
+    | '/horses/$horseId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/transfer'
     | '/studbook'
+    | '/horses/$horseId'
   id:
     | '__root__'
     | '/_app'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/_app/transfer'
     | '/_public/studbook'
     | '/_public/'
+    | '/_app/horses/$horseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -292,14 +304,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/horses/$horseId': {
+      id: '/_app/horses/$horseId'
+      path: '/$horseId'
+      fullPath: '/horses/$horseId'
+      preLoaderRoute: typeof AppHorsesHorseIdRouteImport
+      parentRoute: typeof AppHorsesRoute
+    }
   }
 }
+
+interface AppHorsesRouteChildren {
+  AppHorsesHorseIdRoute: typeof AppHorsesHorseIdRoute
+}
+
+const AppHorsesRouteChildren: AppHorsesRouteChildren = {
+  AppHorsesHorseIdRoute: AppHorsesHorseIdRoute,
+}
+
+const AppHorsesRouteWithChildren = AppHorsesRoute._addFileChildren(
+  AppHorsesRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppChatRoute: typeof AppChatRoute
   AppDashboardRoute: typeof AppDashboardRoute
-  AppHorsesRoute: typeof AppHorsesRoute
+  AppHorsesRoute: typeof AppHorsesRouteWithChildren
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
   AppRegisterRoute: typeof AppRegisterRoute
@@ -310,7 +341,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppChatRoute: AppChatRoute,
   AppDashboardRoute: AppDashboardRoute,
-  AppHorsesRoute: AppHorsesRoute,
+  AppHorsesRoute: AppHorsesRouteWithChildren,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
   AppRegisterRoute: AppRegisterRoute,
@@ -341,3 +372,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
