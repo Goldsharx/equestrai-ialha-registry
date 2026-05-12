@@ -55,8 +55,12 @@ function AdminFees() {
 
   useEffect(() => { if (!checking) void load(); }, [checking]);
 
-  const updateField = async (id: string, field: keyof Fee, value: string | number | boolean) => {
-    const { error } = await supabase.from("fee_schedule").update({ [field]: value }).eq("id", id);
+  const updateField = async (id: string, field: "description" | "amount" | "active", value: string | number | boolean) => {
+    const patch: { description?: string; amount?: number; active?: boolean } = {};
+    if (field === "description") patch.description = value as string;
+    else if (field === "amount") patch.amount = value as number;
+    else patch.active = value as boolean;
+    const { error } = await supabase.from("fee_schedule").update(patch).eq("id", id);
     if (error) { toast.error(error.message); return; }
     setFees((prev) => prev.map((f) => (f.id === id ? { ...f, [field]: value } : f)));
   };
