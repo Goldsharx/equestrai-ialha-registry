@@ -94,7 +94,6 @@ function SignupPage() {
       return;
     }
     // Welcome email — placeholder; real integration coming later.
-    console.info("[welcome-email] queued for", email);
     toast.success("Welcome to Equestrai!");
     navigate({ to: "/dashboard" });
   };

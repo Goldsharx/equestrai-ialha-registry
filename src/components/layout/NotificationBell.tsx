@@ -70,7 +70,11 @@ export function NotificationBell() {
   }, [user]);
 
   const markRead = async (id: string) => {
-    await supabase.from("notifications").update({ read: true }).eq("id", id);
+    try {
+      await supabase.from("notifications").update({ read: true }).eq("id", id);
+    } catch {
+      // Silent fail; bell will refresh on next realtime event
+    }
   };
 
   return (

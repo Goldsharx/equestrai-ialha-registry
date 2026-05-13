@@ -121,7 +121,7 @@ function StudbookHorsePage() {
 
       <Card>
         <CardHeader><CardTitle className="font-serif text-primary">Pedigree</CardTitle></CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           {pedigree ? (
             <PedigreeChart node={pedigree} generation={0} />
           ) : (
@@ -209,7 +209,7 @@ function PedigreeChart({ node, generation }: { node: any; generation: number }) 
   }
   return (
     <div className="flex items-stretch gap-3">
-      <div className="flex min-w-[140px] items-center">
+      <div className="flex min-w-[100px] sm:min-w-[140px] items-center">
         <NodeBox node={node} />
       </div>
       {(node.sire || node.dam) && (

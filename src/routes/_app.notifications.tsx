@@ -94,7 +94,7 @@ function NotificationsPage() {
       active = false;
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, t]);
 
   const filtered = useMemo(() => {
     if (filter === "all") return items;
@@ -105,7 +105,11 @@ function NotificationsPage() {
 
   const markAsRead = async (id: string) => {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-    await supabase.from("notifications").update({ read: true }).eq("id", id);
+    try {
+      await supabase.from("notifications").update({ read: true }).eq("id", id);
+    } catch {
+      // Optimistic update already applied; silent fail acceptable
+    }
   };
 
   const handleClick = async (n: Notification) => {

@@ -82,7 +82,7 @@ function StudbookPage() {
         )
         .eq("status", "approved");
 
-      if (query) req = req.textSearch("fts", query, { type: "websearch" });
+      if (query) req = req.textSearch("fts", query, { type: "websearch", config: "simple" });
       if (filters.breeds.length) req = req.in("breed_type", filters.breeds);
       if (filters.sexes.length) req = req.in("sex", filters.sexes);
       if (filters.colors.length) req = req.in("color", filters.colors);

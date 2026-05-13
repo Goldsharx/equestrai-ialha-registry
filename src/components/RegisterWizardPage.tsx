@@ -196,7 +196,6 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
 
   const uploadMarkingsCanvas = async (regId: string, blob: Blob) => {
     if (!user?.id) throw new Error("You must be logged in to save markings");
-    console.log("[markings-canvas] uploading drawing", { registration_id: regId });
     const path = `${user.id}/registration-${regId}/markings-${Date.now()}.png`;
     const { error: upErr } = await supabase.storage
       .from("photos")
@@ -218,7 +217,6 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
     });
     if (insErr) throw insErr;
     setMarkingsBlob(null);
-    console.log("[markings-canvas] drawing saved", { registration_id: regId });
   };
 
   const persist = async (
@@ -226,14 +224,12 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
     options: { saveMarkings?: boolean; status?: "draft" | "pending_payment" } = {},
   ): Promise<string | null> => {
     if (!user?.id) {
-      console.warn("[persist] no user — cannot save");
       toast.error("You must be signed in to save a registration");
       return null;
     }
     setSaving(true);
     try {
       const payload = { ...buildPayload(next), status: options.status ?? ("draft" as const) };
-      console.log("[persist] saving registration", { existingId: registrationId, status: payload.status });
       let savedId = registrationId;
       if (registrationId) {
         const { error } = await supabase
@@ -254,7 +250,6 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
       if (savedId && options.saveMarkings && markingsBlob && !next.no_markings) {
         await uploadMarkingsCanvas(savedId, markingsBlob);
       }
-      console.log("[persist] saved", savedId);
       return savedId;
     } catch (err) {
       console.error("[persist] failed", err);
@@ -275,7 +270,6 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
   const goBack = () => setStep((s) => Math.max(1, s - 1));
 
   const handleSaveDraft = async () => {
-    console.log("[save-draft] click", { userId: user?.id, registrationId });
     const id = await persist(data, { saveMarkings: true, status: "draft" });
     if (id) {
       toast.success("Draft saved");
@@ -284,7 +278,6 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
   };
 
   const handleSubmitAndPay = async () => {
-    console.log("[submit-and-pay] click", { userId: user?.id, terms: data.terms_accepted });
     if (!data.terms_accepted) {
       toast.error("Please accept the terms to continue");
       return;
@@ -294,12 +287,10 @@ function RegisterWizardPage({ initialRegistrationId }: { initialRegistrationId?:
       const id = await persist(data, { saveMarkings: true, status: "pending_payment" });
       if (!id) throw new Error("Failed to save registration");
       const returnUrl = `${window.location.origin}/register/${id}/status`;
-      console.log("[submit-and-pay] invoking create-stripe-checkout", { id, returnUrl });
       const { data: stripeData, error: stripeError } = await supabase.functions.invoke(
         "create-stripe-checkout",
         { body: { registration_id: id, return_url: returnUrl } },
       );
-      console.log("Stripe response:", stripeData, stripeError);
       if (stripeError) throw stripeError;
       const checkoutUrl = (stripeData as { checkout_url?: string } | null)?.checkout_url;
       if (!checkoutUrl) throw new Error("No checkout URL returned from payment service");
@@ -1328,7 +1319,7 @@ function StepReview({
             <Button
               type="button"
               variant="outline"
-              onClick={() => { console.log("[ui] Save as Draft clicked"); onSaveDraft(); }}
+              onClick={() => { onSaveDraft(); }}
               disabled={saving || submitting}
             >
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -1337,7 +1328,7 @@ function StepReview({
             <Button
               type="button"
               className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
-              onClick={() => { console.log("[ui] Submit & Pay clicked"); onSubmit(); }}
+              onClick={() => { onSubmit(); }}
               disabled={saving || submitting || !data.terms_accepted}
             >
               {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_public")({
 function PublicLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader unreadCount={0} />
+      <SiteHeader />
       <main className="flex-1">
         <Outlet />
       </main>

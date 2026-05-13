@@ -80,43 +80,56 @@ function ProfilePage() {
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        full_name: profile.full_name,
-        phone: profile.phone,
-        preferred_language: profile.preferred_language,
-        farm_name: profile.farm_name,
-        address_line1: profile.address_line1,
-        address_line2: profile.address_line2,
-        city: profile.city,
-        state: profile.state,
-        zip: profile.zip,
-      })
-      .eq("user_id", user.id);
-    setSaving(false);
-    if (error) toast.error(t("err.tryAgain"));
-    else toast.success(t("profile.saveSuccess"));
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: profile.full_name,
+          phone: profile.phone,
+          preferred_language: profile.preferred_language,
+          farm_name: profile.farm_name,
+          address_line1: profile.address_line1,
+          address_line2: profile.address_line2,
+          city: profile.city,
+          state: profile.state,
+          zip: profile.zip,
+        })
+        .eq("user_id", user.id);
+      if (error) toast.error(t("err.tryAgain"));
+      else toast.success(t("profile.saveSuccess"));
+    } catch (err: any) {
+      toast.error(t("err.tryAgain"));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleChangePassword = async () => {
     if (!profile.email) return toast.error(t("auth.email"));
-    const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) toast.error(error.message);
-    else toast.success(t("profile.resetEmailSent"));
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) toast.error(error.message);
+      else toast.success(t("profile.resetEmailSent"));
+    } catch (err: any) {
+      toast.error(err.message ?? t("err.tryAgain"));
+    }
   };
 
   const handleManagePayments = async () => {
-    const { data, error } = await supabase.functions.invoke("stripe-customer-portal", {
-      body: { return_url: window.location.origin + "/profile" },
-    });
-    if (error || !data?.url) {
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-customer-portal", {
+        body: { return_url: window.location.origin + "/profile" },
+      });
+      if (error || !data?.url) {
+        toast.error(t("profile.portalUnavailable"));
+        return;
+      }
+      window.location.href = data.url as string;
+    } catch (err: any) {
       toast.error(t("profile.portalUnavailable"));
-      return;
     }
-    window.location.href = data.url as string;
   };
 
   if (loading) return <p className="text-sm text-muted-foreground">{t("common.loading")}</p>;

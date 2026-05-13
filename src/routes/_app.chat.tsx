@@ -70,7 +70,7 @@ function ChatPage() {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-12rem)] max-w-3xl flex-col">
+    <div className="mx-auto flex h-[calc(100vh-12rem)] max-w-3xl flex-col px-2 sm:px-0">
       <header className="mb-4">
         <h1 className="font-serif text-3xl text-primary">AI Chat</h1>
         <p className="text-sm text-muted-foreground">

@@ -12,7 +12,7 @@ function AppLayout() {
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen flex-col bg-background">
-        <SiteHeader unreadCount={3} />
+        <SiteHeader />
         <SidebarProvider>
           <div className="flex w-full flex-1">
             <AppSidebar />

@@ -43,6 +43,7 @@ type BuyerProfile = {
   full_name: string | null;
   phone: string | null;
   address_line1: string | null;
+  email: string | null;
 };
 
 type WizardData = {
@@ -280,7 +281,7 @@ function StepBuyer({ data, update }: { data: WizardData; update: (p: Partial<Wiz
       const q = `%${query.trim()}%`;
       const { data, error } = await supabase
         .from("profiles")
-        .select("user_id,full_name,phone,address_line1")
+        .select("user_id,full_name,phone,address_line1,email")
         .or(`full_name.ilike.${q}`)
         .limit(8);
       if (error) throw error;
@@ -292,6 +293,7 @@ function StepBuyer({ data, update }: { data: WizardData; update: (p: Partial<Wiz
     update({
       buyer_id: p.user_id,
       buyer_name: p.full_name ?? "",
+      buyer_email: p.email ?? "",
       buyer_phone: p.phone ?? "",
       buyer_address: p.address_line1 ?? "",
     });
@@ -370,7 +372,7 @@ function StepDetails({
         <Label>Sale date</Label>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("w-[260px] justify-start text-left font-normal")}>
+            <Button variant="outline" className={cn("w-full sm:w-[260px] justify-start text-left font-normal")}>
               <CalendarIcon className="mr-2 h-4 w-4" />
               {format(data.sale_date, "PPP")}
             </Button>

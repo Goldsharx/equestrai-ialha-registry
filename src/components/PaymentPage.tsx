@@ -65,9 +65,10 @@ export function PaymentPage({ kind, recordId, statusPath }: Props) {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
         toast.success("Payment successful!");
         await refetch();
-        if (statusPath) navigate({ to: statusPath, params: { registrationId: recordId } });
+        if (statusPath) navigate({ to: statusPath, params: { registrationId: recordId } }); else navigate({ to: "/dashboard" });
       })();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search?.success]);
 
   const handlePay = async () => {

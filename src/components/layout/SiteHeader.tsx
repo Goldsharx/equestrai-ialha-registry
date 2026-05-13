@@ -29,7 +29,7 @@ function HeaderLanguageToggle() {
   );
 }
 
-export function SiteHeader(_props: { unreadCount?: number } = {}) {
+export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { session, user, signOut } = useAuth();
   const { t } = useLanguage();
